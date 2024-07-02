@@ -1,48 +1,77 @@
-github-download
-===============
+# Renaissance
 
-`github-download` downloads commit comments and select issues metadata, saving the raw JSON and writing summary `.csv` files.
+## Framework7 CLI Options
 
-Installing
-----------
-
-Download the `.jar` file [here](/target/github-download-1.0-SNAPSHOT-jar-with-dependencies.jar). It includes all dependencies. You must have the [Java Runtime Environment](http://java.com/en/download/manual.jsp) version 7 or above.
-
-Usage
------
-
-`github-download` can be run from the command line. It has three required flags:
-
-`-repo`. The full repository name, e.g., `PovertyAction/github-download`.
-
-`-to`. The directory in which to save the metadata. It will be created if it does not exist already.
-
-`-token`. The name of a text file that contains solely a GitHub [OAuth token](https://help.github.com/articles/creating-an-access-token-for-command-line-use/). GitHub will supply you a token, which is a single string. You must copy it to a text file, then specify the name of that file to `-token`.
-
-All together:
+Framework7 app created with following options:
 
 ```
-java -jar github-download.jar -repo PovertyAction/github-download -token token.txt -to metadata
+{
+  "cwd": "D:\\Development Project\\renaissance-project",
+  "type": [
+    "pwa"
+  ],
+  "name": "Renaissance",
+  "framework": "vue",
+  "template": "blank",
+  "bundler": "vite",
+  "cssPreProcessor": false,
+  "theming": {
+    "customColor": true,
+    "color": "#d31145",
+    "darkMode": false,
+    "iconFonts": true
+  },
+  "customBuild": false
+}
 ```
 
-If the name of the `.jar` file is not `github-download.jar`, use the actual filename in the command above, or rename the file as `github-download.jar`. If the file is not in the current working directory, you will have to specify its path.
+## Install Dependencies
 
-Next, specify the metadata to download:
-
-`-issues`. Download select issues metadata.
-
-`-cc`. Download commit comments, including in-line notes.
-
-To download all supported metadata:
-
+First of all we need to install dependencies, run in terminal
 ```
-java -jar github-download.jar -repo PovertyAction/github-download -token token.txt -to metadata -issues -cc
+npm install
 ```
 
-You may see the following warning message, which is safe to ignore:
+## NPM Scripts
+
+* 🔥 `start` - run development server
+* 🔧 `dev` - run development server
+* 🔧 `build` - build web app for production
+
+## Vite
+
+There is a [Vite](https://vitejs.dev) bundler setup. It compiles and bundles all "front-end" resources. You should work only with files located in `/src` folder. Vite config located in `vite.config.js`.
+
+## PWA
+
+This is a PWA. Don't forget to check what is inside of your `service-worker.js`. It is also recommended that you disable service worker (or enable "Update on reload") in browser dev tools during development.
+## Assets
+
+Assets (icons, splash screens) source images located in `assets-src` folder. To generate your own icons and splash screen images, you will need to replace all assets in this directory with your own images (pay attention to image size and format), and run the following command in the project directory:
 
 ```
-SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
-SLF4J: Defaulting to no-operation (NOP) logger implementation
-SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+framework7 assets
 ```
+
+Or launch UI where you will be able to change icons and splash screens:
+
+```
+framework7 assets --ui
+```
+
+
+
+## Documentation & Resources
+
+* [Framework7 Core Documentation](https://framework7.io/docs/)
+* [Framework7 Vue Documentation](https://framework7.io/vue/)
+
+
+* [Framework7 Icons Reference](https://framework7.io/icons/)
+* [Community Forum](https://forum.framework7.io)
+
+## Support Framework7
+
+Love Framework7? Support project by donating or pledging on:
+- Patreon: https://patreon.com/framework7
+- OpenCollective: https://opencollective.com/framework7

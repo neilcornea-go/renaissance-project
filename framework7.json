@@ -1,0 +1,18 @@
+{
+  "cwd": "D:\\Development Project\\renaissance-project",
+  "type": [
+    "pwa"
+  ],
+  "name": "Renaissance",
+  "framework": "vue",
+  "template": "blank",
+  "bundler": "vite",
+  "cssPreProcessor": false,
+  "theming": {
+    "customColor": true,
+    "color": "#d31145",
+    "darkMode": false,
+    "iconFonts": true
+  },
+  "customBuild": false
+}
