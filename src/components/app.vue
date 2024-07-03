@@ -24,8 +24,10 @@
         colors: {
           primary: '#d31145',
         },
-
-
+        view: {
+          browserHistory: true,
+          browserHistorySeparator: '',          
+        },
 
         // App store
         store: store,

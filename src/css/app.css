@@ -1,3 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.navbar ~ *, .navbars ~ * {
+    --f7-page-navbar-offset: auto;
+}
