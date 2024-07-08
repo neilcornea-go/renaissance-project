@@ -1,11 +1,9 @@
-
-import HomePage from '../pages/home.vue';
 import FirstStep from '../pages/step1.vue';
 
 var routes = [
   {
     path: '/',
-    component: HomePage,
+    component: FirstStep,
   },
   {
     path: '/step-1',

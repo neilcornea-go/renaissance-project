@@ -5,7 +5,7 @@ import Header from './header.vue';
 
 <template>
     <!-- Global Layout -->
-    <f7-page name="renaissance">
+    <f7-page name="renaissance" class="bg-white">
         <!-- Header -->
         <Header />
         <!-- Main -->

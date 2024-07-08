@@ -1,14 +1,23 @@
 <script setup>
-import GlobalLayout from '../components/layout.vue';
-import StepIndicator from '../components/step.vue';
-import Title from '../components/title.vue';
-import Subtitle from '../components/subtitle.vue';
+import { ref } from 'vue';
+import GlobalLayout from '../components/structure/layout.vue';
+import StepIndicator from '../components/common/step.vue';
+import Title from '../components/common/title.vue';
+import Subtitle from '../components/common/subtitle.vue';
+import Divider from '../components/common/divider.vue';
+import DocumentInfo from '../components/main/document-info.vue';
 
+// Form Input Components
+import InputText from '../components/form/input-text.vue';
+import InputFile from '../components/form/input-file.vue';
+
+const inputValue = ref('');
+const selectedFiles = ref([]);
 </script>
 
 <template>
     <GlobalLayout>
-        <section class="flex flex-col justify-between" style="height: calc(100vh - 150px);">
+        <section class="flex flex-col gap-8">
             <!-- Steps Indicator -->
             <div class="space-y-1">
                 <StepIndicator step="1" />
@@ -17,17 +26,52 @@ import Subtitle from '../components/subtitle.vue';
                     subtitle="Let us know about your claim by entering your policy number and uploading all the required documents." />
             </div>
 
-            <!-- Form -->
-            <div class="">
-                <f7-list>
-                    <f7-list-input outline label="Name" type="text" placeholder="Your name" clear-button></f7-list-input>
-                </f7-list>
-            </div>
+            <!-- Upload Documents -->
+            <div class="flex flex-col gap-4">
+                <!-- Policy Number Input -->
+                <InputText v-model="inputValue" label="Policy number" placeholder="e.g. 123456789B" />
 
-            <!-- Action Button -->
-            <div class="space-y-4">
-                <f7-button fill round large>Next</f7-button>
-                <f7-button outline round large>Back</f7-button>
+                <Divider />
+
+                <!-- Title Header -->
+                <div class="space-y-2">
+                    <h2 class="text-gray-700 text-lg font-medium">Upload documents</h2>
+                    <p class="flex items-center gap-1 text-blue-500">
+                        <svg class="w-[20px] h-[20px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                            height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="1.5"
+                                d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                        </svg>
+                        <span class="cursor-pointer hover:underline" data-sheet=".demo-sheet-swipe-to-close">View document checklist</span>
+                    </p>
+                </div>
+
+                <!-- Click to Upload Action -->
+                <div class="space-y-2">
+                    <InputFile v-model="selectedFiles" />
+                    <span class="text-gray-500">Supported files: doc, docx, pdf, jpg (max. 5MB)</span>
+                </div>
+
+                <!-- Documents List -->
+                 <div>
+                    <DocumentInfo type="normal" />
+                 </div>
+
+                 <!-- Error Prompt -->
+                <div class="bg-gray-100 px-4 py-8 rounded">
+                    <p class="text-red-500 text-base mb-4">It appears that you are filing a claim for an accident. 
+                        The document(s) below will be removed as they are not required.
+                    </p>
+
+                    <!-- Error Documents List -->
+                    <DocumentInfo type="error" />
+                </div>
+
+                <!-- Action Button -->
+                <div class="bg-white my-3">
+                    <f7-button fill round large>Validate</f7-button>
+                </div>
             </div>
         </section>
     </GlobalLayout>
