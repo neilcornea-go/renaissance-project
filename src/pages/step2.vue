@@ -4,18 +4,20 @@ import GlobalLayout from '../components/structure/layout.vue';
 import StepIndicator from '../components/common/step.vue';
 import Title from '../components/common/title.vue';
 import Subtitle from '../components/common/subtitle.vue';
-import Divider from '../components/common/divider.vue';
-import DocumentInfo from '../components/main/document-info.vue';
-import ChecklistPopup from '../components/main/checklist-popup.vue';
 
 // Form Input Components
 import InputText from '../components/form/input-text.vue';
 import InputDate from '../components/form/input-date.vue';
-import InputFile from '../components/form/input-file.vue';
+import Dropdown from '../components/form/dropdown.vue';
 
+// Composable
+import { useStaticData } from '../composable/useStaticData';
+
+const { typeInjuryOptions, partBodyInjuredOptions } = useStaticData();
 const inputValue = ref('');
 const dateValue = ref('');
-const selectedFiles = ref([]);
+const selectedInjury = ref('Contusion Injury');
+const selectedBodyInjured = ref('Head');
 </script>
 
 <template>
@@ -35,24 +37,11 @@ const selectedFiles = ref([]);
                 <InputDate v-model="dateValue" label="Accident date" />
                 <InputText v-model="inputValue" label="Accident Location" placeholder="Enter accident location" />
 
-                <div class="relative mb-4">
-                    <span class="absolute right-3 top-[50%]">
-                        <svg class="w-[34px] h-[34px] text-gray-600" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                stroke-width="1.5" d="m8 10 4 4 4-4" />
-                        </svg>
-                    </span>
-                    <div class="space-y-2">
-                        <span class="text-base text-gray-700 font-medium">Injury type</span>
-                        <select class="w-full text-base border border-gray-400 p-4 rounded text-gray-600 focus:ring-1 ring-[#1f78ad] outline-none focus:border-[#1f78ad] focus:bg-[#F2F7FA] duration-75 transition ease-in">
-                            <option value="volvo">Contusion Injury</option>
-                            <option value="saab">Saab</option>
-                            <option value="mercedes">Mercedes</option>
-                            <option value="audi">Audi</option>
-                        </select>
-                    </div>
-                </div>
+                <!-- Injury Type Dropdown -->
+                <Dropdown v-model="selectedInjury" label="Injury type" :data="typeInjuryOptions" />
+
+                <!-- Part of body injured -->
+                <Dropdown v-model="selectedBodyInjured" label="Part of body injured" :data="partBodyInjuredOptions" />
 
                 <!-- Action Button -->
                 <div class="bg-white my-3 space-y-4">

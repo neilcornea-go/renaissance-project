@@ -2,17 +2,17 @@
 const checklistData = {
     "list": [
         {
-            "index": 1,
+            "id": 1,
             "title": "Accident claims",
             "items": ["Government ID", "Police/narration report", "Official receipts", "Hospital statement of account", "Certificate of employment / medical certificate"]
         },
         {
-            "index": 2,
+            "id": 2,
             "title": "Illness claims",
             "items": ["Government ID", "Hospital statement of account", "Medical certificate", "Histopath report", "Discharge summary"]
         },
         {
-            "index": 3,
+            "id": 3,
             "title": "Death claims",
             "items": ["Death certificate of the deceased", "Police/narration report", "Government ID of benefeciary", "Marriage certificate"]
         },
@@ -36,11 +36,11 @@ const checklistData = {
         <f7-block>
             <h3 class="text-gray-800 font-bold text-lg uppercase mb-6">Documents Checklist</h3>
 
-            <div class="flex gap-4 mb-4 pb-4" v-for="(data, index) in checklistData.list" :key="data.index"
+            <div class="flex gap-4 mb-4 pb-4" v-for="(data, index) in checklistData.list" :key="data.id"
                 :class="{ 'border-b': index !== checklistData.list.length - 1 }">
                 <p
                     class="bg-gray-300 p-4 rounded-full flex-none grow-0 shrink-0 w-4 h-4 flex items-center justify-center font-medium text-gray-700">
-                    {{ data.index }}
+                    {{ data.id }}
                 </p>
                 <p>
                     <span class="font-bold text-gray-700 text-base">{{ data.title }}</span>
