@@ -28,7 +28,7 @@ const selectedClass = (value) => selectedValue.value === value ? 'bg-gray-200' :
 <template>
   <div class="space-y-2 mb-4">
     <p class="text-base text-gray-700 font-medium">{{ title }}</p>
-    <div class="flex w-1/3">
+    <div class="flex w-full md:w-1/3">
       <label 
         v-for="label in data" 
         :key="label.id" 
