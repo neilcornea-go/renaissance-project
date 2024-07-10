@@ -2,12 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
-.navbar ~ *, .navbars ~ * {
+.navbar~*,
+.navbars~* {
     --f7-page-navbar-offset: auto;
 }
 
-.link, .tab-link {
+.link,
+.tab-link {
     --f7-touch-ripple-color: transparent;
+}
+
+input[type='date'],
+input[type='text'],
+select
+{
+    border: 1px solid #9CA3AF;
+    border-radius: 4px;
+    padding: 1rem;
+}
+
+input[type='text']::placeholder {
+    /* color: #3a3b3d; */
 }
 
 .checklist-popup .navbar-inner {
