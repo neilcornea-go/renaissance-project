@@ -15,9 +15,15 @@ const partBodyInjuredOptions = ref([
     { id: '5', option: 'Nose' }
 ]);
 
+const mainCheckboxOptions = ref([
+    { id: '1', option: 'Yes' },
+    { id: '2', option: 'No' },
+]);
+
 export function useStaticData() {
     return {
         typeInjuryOptions,
-        partBodyInjuredOptions
+        partBodyInjuredOptions,
+        mainCheckboxOptions
     };
 }
