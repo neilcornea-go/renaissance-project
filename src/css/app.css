@@ -5,3 +5,17 @@
 .navbar ~ *, .navbars ~ * {
     --f7-page-navbar-offset: auto;
 }
+
+.link, .tab-link {
+    --f7-touch-ripple-color: transparent;
+}
+
+.checklist-popup .navbar-inner {
+    background: #E5E7EB;
+}
+
+@media (min-width: 630px) and (min-height: 630px) {
+    .popup.checklist-popup.modal-in {
+        height: 670px;
+    }
+}
