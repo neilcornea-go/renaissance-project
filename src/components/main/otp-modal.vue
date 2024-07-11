@@ -19,7 +19,7 @@ const otpIsOpen = computed({
     }
 });
 
-const timer = ref(300); // 300 seconds = 5 minutes
+const timer = ref(300);
 const intervalId = ref(null);
 
 const formattedTime = computed(() => {
@@ -45,8 +45,6 @@ const resetTimer = () => {
 };
 
 const resendCode = () => {
-    // Logic to resend the code goes here
-    console.log("Code resent");
     resetTimer();
 };
 
