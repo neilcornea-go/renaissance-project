@@ -35,7 +35,7 @@ const updateValue = (event) => {
             <select
                 class="w-full text-base border border-gray-400 p-4 rounded text-gray-600 focus:ring-1 ring-[#1f78ad] outline-none focus:border-[#1f78ad] focus:bg-[#F2F7FA] duration-75 transition ease-in"
                 :value="modelValue" @change="updateValue">
-                <option v-for="item in data" :key="item.id" :value="item.option">{{ item.option }}</option>
+                <option v-for="item in data" :key="item.id" :value="item.option">{{ item.option ? item.option : item }}</option>
             </select>
         </div>
     </div>

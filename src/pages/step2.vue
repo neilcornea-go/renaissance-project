@@ -16,7 +16,6 @@ import Checkbox from '../components/form/checkbox.vue';
 
 // Composable
 import { useStaticData } from '../composable/useStaticData';
-
 const { typeInjuryOptions, partBodyInjuredOptions, mainCheckboxOptions, natureDeathOptions, relationshipOptions } = useStaticData();
 
 // Data Hook

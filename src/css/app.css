@@ -49,3 +49,8 @@ input[type='text']::placeholder {
     transition-property: transform;
 }
 
+.iti--inline-dropdown .iti__dropdown-content {
+    width: 300px !important;
+    height: 200px !important;
+    overflow: hidden;
+}

@@ -4,13 +4,10 @@ import GlobalLayout from '../components/structure/layout.vue';
 import StepIndicator from '../components/common/step.vue';
 import Title from '../components/common/title.vue';
 import Subtitle from '../components/common/subtitle.vue';
-import Divider from '../components/common/divider.vue';
+import FormHeader from '../components/common/form-header.vue';
 
-// Form Input Components
-import InputText from '../components/form/input-text.vue';
-import InputDate from '../components/form/input-date.vue';
-import Dropdown from '../components/form/dropdown.vue';
-import Checkbox from '../components/form/checkbox.vue';
+// Documents Form Details
+import GovernmentIDForm from '../components/main/governmentid-form.vue';
 
 </script>
 
@@ -27,139 +24,58 @@ import Checkbox from '../components/form/checkbox.vue';
             </div>
 
             <!-- Edit Document Details -->
-            <div>
-                <f7-toolbar bottom tabbar>
-                    <f7-link tab-link="#tab-1" tab-link-active>Tab 1</f7-link>
-                    <f7-link tab-link="#tab-2">Tab 2</f7-link>
-                    <f7-link tab-link="#tab-3">Tab 3</f7-link>
-                </f7-toolbar>
+            <f7-tabs animated>
+                <f7-tab id="tab-1" class="page-content" tab-active>
+                    <FormHeader title="Government ID" link="https://www.google.com/" />
+                    <GovernmentIDForm />
 
-                <f7-tabs animated>
-                    <f7-tab id="tab-1" class="page-content" tab-active>
-                        <f7-block>
-                            <p>Tab 1 content</p>
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ullam enim quia molestiae
-                                facilis laudantium voluptates obcaecati officia cum, sit libero commodi. Ratione illo
-                                suscipit temporibus sequi iure ad laboriosam accusamus?
-                            </p>
-                            <p>
-                                Saepe explicabo voluptas ducimus provident, doloremque quo totam molestias! Suscipit
-                                blanditiis eaque exercitationem praesentium reprehenderit, fuga accusamus possimus sed,
-                                sint facilis ratione quod, qui dignissimos voluptas! Aliquam rerum consequuntur
-                                deleniti.
-                            </p>
-                            <p>
-                                Totam reprehenderit amet commodi ipsum nam provident doloremque possimus odio itaque,
-                                est animi culpa modi consequatur reiciendis corporis libero laudantium sed eveniet unde
-                                delectus a maiores nihil dolores? Natus, perferendis.
-                            </p>
-                            <p>
-                                Atque quis totam repellendus omnis alias magnam corrupti, possimus aspernatur
-                                perspiciatis quae provident consequatur minima doloremque blanditiis nihil maxime
-                                ducimus earum autem. Magni animi blanditiis similique iusto, repellat sed quisquam!
-                            </p>
-                            <p>
-                                Suscipit, facere quasi atque totam. Repudiandae facilis at optio atque, rem nam, natus
-                                ratione cum enim voluptatem suscipit veniam! Repellat, est debitis. Modi nam mollitia
-                                explicabo, unde aliquid impedit! Adipisci!
-                            </p>
-                            <p>
-                                Deserunt adipisci tempora asperiores, quo, nisi ex delectus vitae consectetur iste
-                                fugiat iusto dolorem autem. Itaque, ipsa voluptas, a assumenda rem, dolorum porro
-                                accusantium, officiis veniam nostrum cum cumque impedit.
-                            </p>
-                            <p>
-                                Laborum illum ipsa voluptatibus possimus nesciunt ex consequatur rem, natus ad
-                                praesentium rerum libero consectetur temporibus cupiditate atque aspernatur, eaque
-                                provident eligendi quaerat ea soluta doloremque. Iure fugit, minima facere.
-                            </p>
-                        </f7-block>
-                    </f7-tab>
-                    <f7-tab id="tab-2" class="page-content">
-                        <f7-block>
-                            <p>Tab 2 content</p>
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ullam enim quia molestiae
-                                facilis laudantium voluptates obcaecati officia cum, sit libero commodi. Ratione illo
-                                suscipit temporibus sequi iure ad laboriosam accusamus?
-                            </p>
-                            <p>
-                                Saepe explicabo voluptas ducimus provident, doloremque quo totam molestias! Suscipit
-                                blanditiis eaque exercitationem praesentium reprehenderit, fuga accusamus possimus sed,
-                                sint facilis ratione quod, qui dignissimos voluptas! Aliquam rerum consequuntur
-                                deleniti.
-                            </p>
-                            <p>
-                                Totam reprehenderit amet commodi ipsum nam provident doloremque possimus odio itaque,
-                                est animi culpa modi consequatur reiciendis corporis libero laudantium sed eveniet unde
-                                delectus a maiores nihil dolores? Natus, perferendis.
-                            </p>
-                            <p>
-                                Atque quis totam repellendus omnis alias magnam corrupti, possimus aspernatur
-                                perspiciatis quae provident consequatur minima doloremque blanditiis nihil maxime
-                                ducimus earum autem. Magni animi blanditiis similique iusto, repellat sed quisquam!
-                            </p>
-                            <p>
-                                Suscipit, facere quasi atque totam. Repudiandae facilis at optio atque, rem nam, natus
-                                ratione cum enim voluptatem suscipit veniam! Repellat, est debitis. Modi nam mollitia
-                                explicabo, unde aliquid impedit! Adipisci!
-                            </p>
-                            <p>
-                                Deserunt adipisci tempora asperiores, quo, nisi ex delectus vitae consectetur iste
-                                fugiat iusto dolorem autem. Itaque, ipsa voluptas, a assumenda rem, dolorum porro
-                                accusantium, officiis veniam nostrum cum cumque impedit.
-                            </p>
-                            <p>
-                                Laborum illum ipsa voluptatibus possimus nesciunt ex consequatur rem, natus ad
-                                praesentium rerum libero consectetur temporibus cupiditate atque aspernatur, eaque
-                                provident eligendi quaerat ea soluta doloremque. Iure fugit, minima facere.
-                            </p>
-                        </f7-block>
-                    </f7-tab>
-                    <f7-tab id="tab-3" class="page-content">
-                        <f7-block>
-                            <p>Tab 3 content</p>
-                            <p>
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ullam enim quia molestiae
-                                facilis laudantium voluptates obcaecati officia cum, sit libero commodi. Ratione illo
-                                suscipit temporibus sequi iure ad laboriosam accusamus?
-                            </p>
-                            <p>
-                                Saepe explicabo voluptas ducimus provident, doloremque quo totam molestias! Suscipit
-                                blanditiis eaque exercitationem praesentium reprehenderit, fuga accusamus possimus sed,
-                                sint facilis ratione quod, qui dignissimos voluptas! Aliquam rerum consequuntur
-                                deleniti.
-                            </p>
-                            <p>
-                                Totam reprehenderit amet commodi ipsum nam provident doloremque possimus odio itaque,
-                                est animi culpa modi consequatur reiciendis corporis libero laudantium sed eveniet unde
-                                delectus a maiores nihil dolores? Natus, perferendis.
-                            </p>
-                            <p>
-                                Atque quis totam repellendus omnis alias magnam corrupti, possimus aspernatur
-                                perspiciatis quae provident consequatur minima doloremque blanditiis nihil maxime
-                                ducimus earum autem. Magni animi blanditiis similique iusto, repellat sed quisquam!
-                            </p>
-                            <p>
-                                Suscipit, facere quasi atque totam. Repudiandae facilis at optio atque, rem nam, natus
-                                ratione cum enim voluptatem suscipit veniam! Repellat, est debitis. Modi nam mollitia
-                                explicabo, unde aliquid impedit! Adipisci!
-                            </p>
-                            <p>
-                                Deserunt adipisci tempora asperiores, quo, nisi ex delectus vitae consectetur iste
-                                fugiat iusto dolorem autem. Itaque, ipsa voluptas, a assumenda rem, dolorum porro
-                                accusantium, officiis veniam nostrum cum cumque impedit.
-                            </p>
-                            <p>
-                                Laborum illum ipsa voluptatibus possimus nesciunt ex consequatur rem, natus ad
-                                praesentium rerum libero consectetur temporibus cupiditate atque aspernatur, eaque
-                                provident eligendi quaerat ea soluta doloremque. Iure fugit, minima facere.
-                            </p>
-                        </f7-block>
-                    </f7-tab>
-                </f7-tabs>
-            </div>
+                    <!-- Action Button -->
+                    <div class="space-y-4">
+                        <f7-button fill round large tab-link="#tab-2">Next</f7-button>
+                        <f7-button outline round large>Back</f7-button>
+                    </div>
+                </f7-tab>
+                <f7-tab id="tab-2" class="page-content" e>
+                    <f7-block>
+                        <p>Tab 2 content</p>
+                    </f7-block>
+
+                    <div class="space-y-4">
+                        <f7-button fill round large tab-link="#tab-3">Next</f7-button>
+                        <f7-button outline round large tab-link="#tab-1">Back</f7-button>
+                    </div>
+                </f7-tab>
+                <f7-tab id="tab-3" class="page-content">
+                    <f7-block>
+                        <p>Tab 3 content</p>
+                    </f7-block>
+
+                    <div class="space-y-4">
+                        <f7-button fill round large tab-link="#tab-4">Next</f7-button>
+                        <f7-button outline round large tab-link="#tab-2">Back</f7-button>
+                    </div>
+                </f7-tab>
+                <f7-tab id="tab-4" class="page-content">
+                    <f7-block>
+                        <p>Tab 4 content</p>
+                    </f7-block>
+
+                    <div class="space-y-4">
+                        <f7-button fill round large tab-link="#tab-5">Next</f7-button>
+                        <f7-button outline round large tab-link="#tab-3">Back</f7-button>
+                    </div>
+                </f7-tab>
+                <f7-tab id="tab-5" class="page-content">
+                    <f7-block>
+                        <p>Tab 5 content</p>
+                    </f7-block>
+
+                    <div class="space-y-4">
+                        <f7-button fill round large>Next</f7-button>
+                        <f7-button outline round large tab-link="#tab-4">Back</f7-button>
+                    </div>
+                </f7-tab>
+            </f7-tabs>
         </section>
     </GlobalLayout>
 </template>

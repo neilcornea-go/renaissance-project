@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // BACKEND URLS and Credentials
-axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = false;
 
 // Backend URL Localhost
 axios.defaults.baseURL = "http://127.0.0.1:5173";

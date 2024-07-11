@@ -45,6 +45,11 @@ const relationshipOptions = ref([
     { id: '3', option: 'Mother' },
 ]);
 
+const genderOptions = ref([
+    { id: '1', option: 'Male' },
+    { id: '2', option: 'Female' },
+]);
+
 export function useStaticData() {
     return {
         bankNameOptions,
@@ -53,6 +58,7 @@ export function useStaticData() {
         partBodyInjuredOptions,
         mainCheckboxOptions,
         natureDeathOptions,
-        relationshipOptions
+        relationshipOptions,
+        genderOptions
     };
 }

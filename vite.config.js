@@ -32,6 +32,9 @@ export default async () => {
     server: {
       host: true,
     },
+    optimizeDeps: {
+      exclude: ['js-big-decimal']
+    }
 
   };
 }
