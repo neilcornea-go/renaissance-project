@@ -1,3 +1,3 @@
 <template>
-    <hr class="my-3 border border-gray-200">
+    <hr class="my-3">
 </template>

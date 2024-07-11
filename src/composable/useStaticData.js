@@ -20,10 +20,23 @@ const mainCheckboxOptions = ref([
     { id: '2', option: 'No' },
 ]);
 
+const natureDeathOptions = ref([
+    { id: '1', option: 'Illness' },
+    { id: '2', option: 'Accident' },
+]);
+
+const relationshipOptions = ref([
+    { id: '1', option: 'Spouse' },
+    { id: '2', option: 'Relative' },
+    { id: '3', option: 'Mother' },
+]);
+
 export function useStaticData() {
     return {
         typeInjuryOptions,
         partBodyInjuredOptions,
-        mainCheckboxOptions
+        mainCheckboxOptions,
+        natureDeathOptions,
+        relationshipOptions
     };
 }
