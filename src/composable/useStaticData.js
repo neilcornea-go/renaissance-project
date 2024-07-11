@@ -15,6 +15,20 @@ const partBodyInjuredOptions = ref([
     { id: '5', option: 'Nose' }
 ]);
 
+const typeOfAccountOptions = ref([
+    { id: '1', option: 'Current account' },
+    { id: '2', option: 'Current account2' },
+    { id: '3', option: 'Current account3' },
+
+]);
+
+const bankNameOptions = ref([
+    { id: '1', option: 'Public Bank' },
+    { id: '2', option: 'Public Bank2' },
+    { id: '3', option: 'Public Bank3' },
+
+]);
+
 const mainCheckboxOptions = ref([
     { id: '1', option: 'Yes' },
     { id: '2', option: 'No' },
@@ -33,6 +47,8 @@ const relationshipOptions = ref([
 
 export function useStaticData() {
     return {
+        bankNameOptions,
+        typeOfAccountOptions,
         typeInjuryOptions,
         partBodyInjuredOptions,
         mainCheckboxOptions,

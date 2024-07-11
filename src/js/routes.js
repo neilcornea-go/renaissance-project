@@ -1,5 +1,6 @@
 import FirstStep from '../pages/step1.vue';
 import SecondStep from '../pages/step2.vue';
+import FourthStep from '../pages/step4.vue';
 
 var routes = [
   {
@@ -13,6 +14,10 @@ var routes = [
   {
     path: '/step-2',
     component: SecondStep,
+  },
+  {
+    path: '/step-4',
+    component: FourthStep,
   },
 ];
 

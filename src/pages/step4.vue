@@ -1,0 +1,63 @@
+<script setup>
+import { ref } from 'vue';
+import GlobalLayout from '../components/structure/layout.vue';
+import StepIndicator from '../components/common/step.vue';
+import Title from '../components/common/title.vue';
+import Subtitle from '../components/common/subtitle.vue';
+import ClaimsInfo from '../components/main/claims-info.vue';
+
+// Form Input Components
+import InputText from '../components/form/input-text.vue';
+import InputDate from '../components/form/input-date.vue';
+import Dropdown from '../components/form/dropdown.vue';
+import Checkbox from '../components/form/checkbox.vue';
+
+// Composable
+import { useStaticData } from '../composable/useStaticData';
+
+const { bankNameOptions, typeOfAccountOptions } = useStaticData();
+
+const inputAccountName = ref('');
+const inputBankAccount = ref('');
+const selectedBankName = ref('Public Bank');
+const selectedTypeOfAccount = ref('Current account');
+
+</script>
+
+<template>
+    <GlobalLayout>
+        <section class="flex flex-col gap-8">
+            <!-- Steps Indicator -->
+            <div class="space-y-1">
+                <StepIndicator step="4" />
+                <Title title="Your Bank Details" />
+                <Subtitle
+                    subtitle="Kindly check your bank account details are accurate or you can click to edit the details" />
+            </div>
+
+
+             <div class="space-y-2">
+                <h2 class="text-gray-700 text-lg font-medium">Bank account details</h2>
+            </div>
+            <!-- Edit Result Form -->
+            <div class="flex flex-col">
+                <!-- Inputs -->
+                <InputText v-model="inputAccountName" label="Account name" placeholder="e.g. John Smith" />
+
+                <InputText v-model="inputBankAccount" label="Bank account number" placeholder="e.g. 865301828712" />
+
+                <!-- Bank name Dropdown -->
+                <Dropdown v-model="selectedBankName" label="Bank name" :data="bankNameOptions" />
+
+                <!-- Type of account dropdown -->
+                <Dropdown v-model="selectedTypeOfAccount" label="Type of account" :data="typeOfAccountOptions" />
+
+                <!-- Action Button -->
+                <div class="bg-white my-3 space-y-4">
+                    <f7-button fill round large>Next</f7-button>
+                    <f7-button outline round large>Back</f7-button>
+                </div>
+            </div>
+        </section>
+    </GlobalLayout>
+</template>
