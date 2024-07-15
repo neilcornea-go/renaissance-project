@@ -7,7 +7,7 @@ import Subtitle from '../components/common/subtitle.vue';
 import FormHeader from '../components/common/form-header.vue';
 
 // Documents Form Details
-import GovernmentIDForm from '../components/main/governmentid-form.vue';
+import GovernmentIDForm from '../components/form/governmentid-form.vue';
 
 </script>
 

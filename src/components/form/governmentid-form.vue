@@ -3,10 +3,10 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
 // Form Input Components
-import InputText from '../form/input-text.vue';
-import InputDate from '../form/input-date.vue';
-import InputPhone from '../form/input-phone.vue';
-import Dropdown from '../form/dropdown.vue';
+import InputText from '../common/input-text.vue';
+import InputDate from '../common/input-date.vue';
+import InputPhone from '../common/input-phone.vue';
+import Dropdown from '../common/dropdown.vue';
 
 // Composable
 import { useNationalityData } from '../../composable/useNationalityData';
