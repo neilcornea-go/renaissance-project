@@ -8,6 +8,8 @@ import InputDate from '../common/input-date.vue';
 import InputPhone from '../common/input-phone.vue';
 import Dropdown from '../common/dropdown.vue';
 
+import FormHeader from '../common/form-header.vue';
+
 // Composable
 import { useNationalityData } from '../../composable/useNationalityData';
 
@@ -15,9 +17,8 @@ import { useStaticData } from '../../composable/useStaticData';
 const { nationalityOptions } = useNationalityData();
 const { genderOptions } = useStaticData();
 const country = ref([]);
-const stateNames = ref([]);
 
-// Reactive variables
+// Form Data
 const FormData = ref({
     firstname: null,
     lastname: null,
@@ -62,6 +63,8 @@ onMounted(() => {
 </script>
 
 <template>
+    <FormHeader title="Government ID" link="https://www.google.com/" />
+
     <!-- Main Fields -->
     <div>
         <InputText v-model="FormData.firstname" label="First Name" placeholder="e.g. John" />

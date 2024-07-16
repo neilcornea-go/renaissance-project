@@ -47,7 +47,7 @@ const selectedRelationship = ref('Spouse');
             <!-- Edit Result Form - Accident Claims -->
             <div class="flex flex-col">
                 <!-- Inputs -->
-                <InputDate v-model="dateValue" label="Accident date" />
+                <InputDate type="date" v-model="dateValue" label="Accident date" />
                 <InputText v-model="inputValue" label="Accident Location" placeholder="Enter accident location" />
 
                 <!-- Injury Type Dropdown -->
