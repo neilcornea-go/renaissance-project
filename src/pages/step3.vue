@@ -27,10 +27,10 @@ import MedicalCertificateForm from '../components/form/medical-certificate-form.
 
             <!-- Forms Container -->
             <div>
-                <!-- <GovernmentIDForm /> -->
+                <GovernmentIDForm />
                 <!-- <NarationReportForm /> -->
                 <!-- <HospitalStatementForm /> -->
-                <MedicalCertificateForm />
+                <!-- <MedicalCertificateForm /> -->
             </div>
         </section>
     </GlobalLayout>

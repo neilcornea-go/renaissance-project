@@ -69,7 +69,7 @@ onMounted(() => {
     <div>
         <InputText v-model="FormData.firstname" label="First Name" placeholder="e.g. John" />
         <InputText v-model="FormData.lastname" label="Last Name" placeholder="e.g. Doe" />
-        <InputDate v-model="FormData.dob" label="Date of birth" />
+        <InputDate type="date" v-model="FormData.dob" label="Date of birth" />
         <InputText v-model="FormData.birthplace" label="Place of birth" placeholder="e.g. Manila" />
         <Dropdown v-model="FormData.nationality" label="Nationality" :data="nationalityOptions" />
         <Dropdown v-model="FormData.sex" label="Sex" :data="genderOptions" />
