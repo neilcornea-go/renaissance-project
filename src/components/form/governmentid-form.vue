@@ -20,6 +20,7 @@ const country = ref([]);
 
 // Form Data
 const FormData = ref({
+    govIdType: "Driver's License",
     firstname: null,
     lastname: null,
     dob: null,
@@ -67,6 +68,8 @@ onMounted(() => {
 
     <!-- Main Fields -->
     <div>
+        <InputText disabled v-model="FormData.govIdType" label="Type of Government ID" placeholder="e.g. Passport" />
+        <InputText v-model="FormData.firstname" label="First Name" placeholder="e.g. John" />
         <InputText v-model="FormData.firstname" label="First Name" placeholder="e.g. John" />
         <InputText v-model="FormData.lastname" label="Last Name" placeholder="e.g. Doe" />
         <InputDate type="date" v-model="FormData.dob" label="Date of birth" />
