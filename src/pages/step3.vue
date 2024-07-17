@@ -10,6 +10,7 @@ import GovernmentIDForm from '../components/form/governmentid-form.vue';
 import NarationReportForm from '../components/form/naration-report-form.vue';
 import HospitalStatementForm from '../components/form/hospital-statement-form.vue';
 import MedicalCertificateForm from '../components/form/medical-certificate-form.vue';
+import MarriageCertificateForm from '../components/form/marriage-certificate-form.vue';
 
 </script>
 
@@ -27,10 +28,11 @@ import MedicalCertificateForm from '../components/form/medical-certificate-form.
 
             <!-- Forms Container -->
             <div>
-                <GovernmentIDForm />
+                <!-- <GovernmentIDForm /> -->
                 <!-- <NarationReportForm /> -->
                 <!-- <HospitalStatementForm /> -->
                 <!-- <MedicalCertificateForm /> -->
+                 <MarriageCertificateForm />
             </div>
         </section>
     </GlobalLayout>

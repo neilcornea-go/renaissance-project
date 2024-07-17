@@ -70,7 +70,6 @@ onMounted(() => {
     <div>
         <InputText disabled v-model="FormData.govIdType" label="Type of Government ID" placeholder="e.g. Passport" />
         <InputText v-model="FormData.firstname" label="First Name" placeholder="e.g. John" />
-        <InputText v-model="FormData.firstname" label="First Name" placeholder="e.g. John" />
         <InputText v-model="FormData.lastname" label="Last Name" placeholder="e.g. Doe" />
         <InputDate type="date" v-model="FormData.dob" label="Date of birth" />
         <InputText v-model="FormData.birthplace" label="Place of birth" placeholder="e.g. Manila" />
