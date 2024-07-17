@@ -12,8 +12,35 @@ import ChecklistPopup from '../components/main/checklist-popup.vue';
 import InputText from '../components/common/input-text.vue';
 import InputFile from '../components/common/input-file.vue';
 
+import { getDocumentAnalysis } from "../../src/js/hooks/documentClassifierAnalysis.js"
+
 const inputValue = ref('');
-const selectedFiles = ref([]);
+const selectedFiles = ref({});
+const multiple = ref(true);
+
+const validateDocuments = () => {
+    console.log(selectedFiles)
+    console.log('validate')
+
+}
+
+const getDocuments = async() => {
+    console.log(selectedFiles.value.documents)
+    selectedFiles.value.documents.forEach(async (x) => {
+        console.log(x.operation_location)
+        const res = await getDocumentAnalysis(x.operation_location);
+        console.log(res);
+        console.log(
+        'confidence rate: ' + Number(res.data.data.analyzeResult.documents[0].confidence)*100 +'%',
+        res.data.data.analyzeResult.documents[0].docType);
+        
+        x.document_type = res.data.data.analyzeResult.documents[0].docType
+        x.confidence_rate = (Number(res.data.data.analyzeResult.documents[0].confidence)*100).toFixed(2) + '%'
+    })
+    
+    console.log(selectedFiles.value)
+}
+
 </script>
 
 <template>
@@ -54,13 +81,14 @@ const selectedFiles = ref([]);
                 
                 <!-- Click to Upload Action -->
                 <div class="space-y-2">
-                    <InputFile v-model="selectedFiles" />
+                    <InputFile v-model="selectedFiles" multiple/>
                     <span class="text-gray-500">Supported files: doc, docx, pdf, jpg (max. 5MB)</span>
                 </div>
 
                 <!-- Documents List -->
                 <div>
-                    <DocumentInfo type="normal" />
+                    <DocumentInfo type="normal" :files="selectedFiles"/>
+                    <!-- {{selectedFiles[0].name}} -->
                 </div>
 
                 <!-- Error Prompt -->
@@ -72,10 +100,14 @@ const selectedFiles = ref([]);
                     <!-- Error Documents List -->
                     <DocumentInfo type="error" />
                 </div>
+                 <!-- Action Button -->
+                 <div class="bg-white my-3">
+                    <f7-button fill round large @click="getDocuments()">Verify Documents</f7-button>
+                </div>
 
                 <!-- Action Button -->
                 <div class="bg-white my-3">
-                    <f7-button fill round large>Validate</f7-button>
+                    <f7-button fill round large @click="validateDocuments()" :disabled="Object.keys(selectedFiles).length === 0">Validate</f7-button>
                 </div>
             </div>
         </section>
