@@ -13,7 +13,9 @@
 }
 
 input[type='date'],
+input[type='time'],
 input[type='text'],
+textarea,
 select
 {
     border: 1px solid #9CA3AF;

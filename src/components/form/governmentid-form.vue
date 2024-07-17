@@ -3,10 +3,12 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
 // Form Input Components
-import InputText from '../form/input-text.vue';
-import InputDate from '../form/input-date.vue';
-import InputPhone from '../form/input-phone.vue';
-import Dropdown from '../form/dropdown.vue';
+import InputText from '../common/input-text.vue';
+import InputDate from '../common/input-date.vue';
+import InputPhone from '../common/input-phone.vue';
+import Dropdown from '../common/dropdown.vue';
+
+import FormHeader from '../common/form-header.vue';
 
 // Composable
 import { useNationalityData } from '../../composable/useNationalityData';
@@ -15,9 +17,8 @@ import { useStaticData } from '../../composable/useStaticData';
 const { nationalityOptions } = useNationalityData();
 const { genderOptions } = useStaticData();
 const country = ref([]);
-const stateNames = ref([]);
 
-// Reactive variables
+// Form Data
 const FormData = ref({
     firstname: null,
     lastname: null,
@@ -62,11 +63,13 @@ onMounted(() => {
 </script>
 
 <template>
+    <FormHeader title="Government ID" link="https://www.google.com/" />
+
     <!-- Main Fields -->
     <div>
         <InputText v-model="FormData.firstname" label="First Name" placeholder="e.g. John" />
         <InputText v-model="FormData.lastname" label="Last Name" placeholder="e.g. Doe" />
-        <InputDate v-model="FormData.dob" label="Date of birth" />
+        <InputDate type="date" v-model="FormData.dob" label="Date of birth" />
         <InputText v-model="FormData.birthplace" label="Place of birth" placeholder="e.g. Manila" />
         <Dropdown v-model="FormData.nationality" label="Nationality" :data="nationalityOptions" />
         <Dropdown v-model="FormData.sex" label="Sex" :data="genderOptions" />

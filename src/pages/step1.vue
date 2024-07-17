@@ -9,8 +9,8 @@ import DocumentInfo from '../components/main/document-info.vue';
 import ChecklistPopup from '../components/main/checklist-popup.vue';
 
 // Form Input Components
-import InputText from '../components/form/input-text.vue';
-import InputFile from '../components/form/input-file.vue';
+import InputText from '../components/common/input-text.vue';
+import InputFile from '../components/common/input-file.vue';
 
 import { getDocumentAnalysis } from "../../src/js/hooks/documentClassifierAnalysis.js"
 

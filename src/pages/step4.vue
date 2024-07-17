@@ -7,10 +7,10 @@ import Subtitle from '../components/common/subtitle.vue';
 import ClaimsInfo from '../components/main/claims-info.vue';
 
 // Form Input Components
-import InputText from '../components/form/input-text.vue';
-import InputDate from '../components/form/input-date.vue';
-import Dropdown from '../components/form/dropdown.vue';
-import Checkbox from '../components/form/checkbox.vue';
+import InputText from '../components/common/input-text.vue';
+import InputDate from '../components/common/input-date.vue';
+import Dropdown from '../components/common/dropdown.vue';
+import Checkbox from '../components/common/checkbox.vue';
 
 // Composable
 import { useStaticData } from '../composable/useStaticData';

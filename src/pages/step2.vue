@@ -9,10 +9,10 @@ import OTPModal from '../components/main/otp-modal.vue';
 import ClaimsInfo from '../components/main/claims-info.vue';
 
 // Form Input Components
-import InputText from '../components/form/input-text.vue';
-import InputDate from '../components/form/input-date.vue';
-import Dropdown from '../components/form/dropdown.vue';
-import Checkbox from '../components/form/checkbox.vue';
+import InputText from '../components/common/input-text.vue';
+import InputDate from '../components/common/input-date.vue';
+import Dropdown from '../components/common/dropdown.vue';
+import Checkbox from '../components/common/checkbox.vue';
 
 // Composable
 import { useStaticData } from '../composable/useStaticData';
@@ -47,7 +47,7 @@ const selectedRelationship = ref('Spouse');
             <!-- Edit Result Form - Accident Claims -->
             <div class="flex flex-col">
                 <!-- Inputs -->
-                <InputDate v-model="dateValue" label="Accident date" />
+                <InputDate type="date" v-model="dateValue" label="Accident date" />
                 <InputText v-model="inputValue" label="Accident Location" placeholder="Enter accident location" />
 
                 <!-- Injury Type Dropdown -->
