@@ -1,12 +1,15 @@
 
 import path from 'path';
 import vue from '@vitejs/plugin-vue';
+import { defineConfig } from 'vite';
+import dotenv from 'dotenv'
 
+dotenv.config()
 
 const SRC_DIR = path.resolve(__dirname, './src');
 const PUBLIC_DIR = path.resolve(__dirname, './public');
 const BUILD_DIR = path.resolve(__dirname, './www',);
-export default async () => {
+export default defineConfig(() => {
 
   return  {
     plugins: [
@@ -34,7 +37,10 @@ export default async () => {
     },
     optimizeDeps: {
       exclude: ['js-big-decimal']
+    },
+    define: {
+      __AZURE__: `"${process.env.VITE_AZURE_SUBSCRIPTION_KEY}"`
     }
 
   };
-}
+})
