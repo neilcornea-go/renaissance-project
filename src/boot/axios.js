@@ -21,7 +21,7 @@ export async function api({ ...params }) {
       baseURL: params.url,
       // timeout: Timeout,
       headers: {
-        'Ocp-Apim-Subscription-Key': '3e924a42916a4cf09713835a8317dc34',
+        'Ocp-Apim-Subscription-Key': __AZURE__,
         'Content-Type': 'application/json'},
     });
     return { ok: true, data: response };

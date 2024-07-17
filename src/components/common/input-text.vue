@@ -20,6 +20,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    error: {
+        type: String,
+        default: '',
+    },
 });
 
 const emits = defineEmits(['update:modelValue']);
@@ -32,9 +36,13 @@ const updateValue = (value) => {
 <template>
     <div v-if="!currency" class="space-y-2 mb-4">
         <span class="text-base text-gray-700 font-medium">{{ label }}</span>
-        <input type="text" :disabled="disabled" :style="disabled ? 'background-color: #F3F4F6;' : ''"
-            class="w-full text-base border border-gray-400 p-4 rounded text-gray-600 focus:ring-1 ring-[#1f78ad] outline-none focus:border-[#1f78ad] focus:bg-[#F2F7FA] duration-75 transition ease-in"
+        <input type="text" :disabled="disabled" :style="disabled ? 'background-color: #F3F4F6;' : error ? 'border: 1px solid #EF4444;' : ''"
+            :class="error ? 'focus:border-red-500 focus:ring-1 ring-red-500 focus:bg-[#FAE8E8]' : 'focus:border-[#1f78ad] focus:ring-1 ring-[#1f78ad] focus:bg-[#F2F7FA]'"
+            class="w-full text-base border p-4 rounded text-gray-600 outline-none duration-75 transition ease-in"
             :placeholder="placeholder" :value="modelValue" @input="updateValue($event.target.value)" />
+        <p v-show="error" class="text-red-500">
+            {{ error }}
+        </p>    
     </div>
 
     <!-- Currency Input -->

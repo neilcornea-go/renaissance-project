@@ -1,6 +1,13 @@
 <script setup>
 import Header from './header.vue';
 
+const props = defineProps({
+    fullWidth: {
+        type: Boolean,
+        default: false
+    }
+});
+
 </script>
 
 <template>
@@ -9,7 +16,7 @@ import Header from './header.vue';
         <!-- Header -->
         <Header />
         <!-- Main -->
-        <main class="max-w-screen-lg mx-auto py-6 px-6">
+        <main :class="fullWidth ? 'w-full' : 'max-w-screen-lg mx-auto py-6 px-6'">
             <slot />
         </main>
     </f7-page>
