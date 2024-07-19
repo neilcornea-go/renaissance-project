@@ -50,6 +50,39 @@ const genderOptions = ref([
     { id: '2', option: 'Female' },
 ]);
 
+const claimsChecklist = ref([
+    {
+        id: '1',
+        claim: 'Accident',
+        key: 'accident',
+        documents: [
+            'govt_id',
+            'police_narration_report',
+            'hospital_statement'
+        ]
+    },
+    {
+        id: '2',
+        claim: 'Death',
+        key: 'death',
+        documents: [
+            'govt_id',
+            'death_certificate',
+            'marriage_certificate'
+        ]
+    },
+    {
+        id: '3',
+        claim: 'Illness',
+        key: 'illness',
+        documents: [
+            'govt_id',
+            'hospital_statement',
+            'medical_certificate'
+        ]
+    }
+]);
+
 export function useStaticData() {
     return {
         bankNameOptions,
@@ -59,6 +92,7 @@ export function useStaticData() {
         mainCheckboxOptions,
         natureDeathOptions,
         relationshipOptions,
-        genderOptions
+        genderOptions,
+        claimsChecklist
     };
 }

@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue';
+const emit = defineEmits(['next', 'back']);
 
 // Form Input Components
 import InputText from '../common/input-text.vue';
@@ -25,7 +26,14 @@ const FormData = ref({
     <div>
         <InputTextarea v-model="FormData.certificateDetails" label="Details" placeholder="Type it here..." />
         <InputText v-model="FormData.nameIssuer" label="Name of issuer" placeholder="Enter name of issuer" />
-        <InputText v-model="FormData.jobTitleIssuer" label="Issuer's job title" placeholder="Enter issuer's job title" />
+        <InputText v-model="FormData.jobTitleIssuer" label="Issuer's job title"
+            placeholder="Enter issuer's job title" />
+    </div>
+
+    <!-- Action Button -->
+    <div class="space-y-4">
+        <f7-button fill round large @click="$emit('next')">Next</f7-button>
+        <f7-button outline round large @click="$emit('back')">Back</f7-button>
     </div>
 
 </template>

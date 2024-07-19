@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+const emit = defineEmits(['next', 'back']);
 import axios from 'axios';
 
 // Form Input Components
@@ -88,6 +89,12 @@ onMounted(() => {
         <InputText v-model="FormData.address2" label="Address 2" placeholder="Address 2" />
         <InputText v-model="FormData.postcode" label="Postcode" placeholder="Postcode" />
         <!-- <Dropdown v-model="FormData.states" label="State" :data="stateNames" /> -->
-         <Dropdown v-model="FormData.country" label="Country" :data="country" />
+        <Dropdown v-model="FormData.country" label="Country" :data="country" />
+    </div>
+
+    <!-- Action Button -->
+    <div class="space-y-4">
+        <f7-button fill round large @click="$emit('next')">Next</f7-button>
+        <f7-button outline round large @click="$emit('back')">Back</f7-button>
     </div>
 </template>
