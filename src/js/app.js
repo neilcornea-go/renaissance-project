@@ -3,6 +3,7 @@ import { createApp } from 'vue';
 
 // Import Pinia
 import { createPinia } from 'pinia';
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 
 // Import Axios
 import './axios';
@@ -28,6 +29,7 @@ Framework7.use(Framework7Vue);
 
 // Init App
 const pinia = createPinia();
+pinia.use(piniaPluginPersistedstate);
 const app = createApp(App);
 
 app.use(pinia);

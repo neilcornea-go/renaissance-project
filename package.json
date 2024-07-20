@@ -28,6 +28,7 @@
     "intl-tel-input": "^23.3.2",
     "material-icons": "^1.13.12",
     "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^3.2.1",
     "skeleton-elements": "^4.0.1",
     "swiper": "^11.1.4",
     "vue": "^3.4.31"
