@@ -26,4 +26,29 @@ export const getDocumentAnalysis = async (url) => {
     }
     return res;
   };
+
+export const analyzeModelDocument = async (param, data, urlData) => {
+    console.log(param, data)
+    const res = await api({
+        // module: "azure", //default is no type or type is null
+        method: "POST",
+        url: `https://go-document-ai.cognitiveservices.azure.com/documentintelligence/documentModels/${urlData.modelID}:analyze`,
+        param, data //data here is the base64 of file
+    });
+  
+    if (res.ok) {
+    }
+    return res;
+  };
+
+export const getExtractedDocument = async (url) => {
+  const res = await api({
+    method: "GET",
+    url
+  });
+
+  if (res.ok) {
+  }
+  return res;
+};
   

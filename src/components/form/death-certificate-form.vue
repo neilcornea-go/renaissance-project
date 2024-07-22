@@ -19,7 +19,7 @@ const FormData = ref({
 
 <template>
 
-    <FormHeader title="Police / narration report" link="https://www.google.com/" />
+    <FormHeader title="Certitficate of Death" link="https://www.google.com/" />
     <!-- Main Fields -->
     <div>
         <InputDate type="date" v-model="FormData.datereport" label="Date of report" />
@@ -31,4 +31,5 @@ const FormData = ref({
         <f7-button fill round large @click="$emit('next')">Next</f7-button>
         <f7-button outline round large @click="$emit('back')">Back</f7-button>
     </div>
+
 </template>

@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue';
+const emit = defineEmits(['next', 'back']);
 
 // Form Input Components
 import InputText from '../common/input-text.vue';
@@ -34,4 +35,9 @@ const FormData = ref({
         <InputText currency="PHP" v-model="FormData.balancedue" label="Balance due" placeholder="Enter balance due" />
     </div>
 
+    <!-- Action Button -->
+    <div class="space-y-4">
+        <f7-button fill round large @click="$emit('next')">Next</f7-button>
+        <f7-button outline round large @click="$emit('back')">Back</f7-button>
+    </div>
 </template>
