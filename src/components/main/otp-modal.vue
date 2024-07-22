@@ -1,21 +1,26 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { f7 } from 'framework7-vue';
 
 const props = defineProps({
     isOpen: {
         type: Boolean,
         default: false
     },
+    otpDone: {
+        type: Boolean,
+        default: false
+    }
 });
 
-const emit = defineEmits(['update:isOpen']);
+const emit = defineEmits(['update:isOpen', 'otpDone']);
 
 const otpIsOpen = computed({
     get() {
         return props.isOpen;
     },
     set(value) {
-        emit('update:isOpen', value);
+        emit('update:isOpen', value );
     }
 });
 
@@ -55,6 +60,18 @@ onMounted(() => {
 onBeforeUnmount(() => {
     clearInterval(intervalId.value);
 });
+
+const goTo = (route) => {
+        f7.views.main.router.navigate(route, {
+            animate: false
+        });
+        otpIsOpen.value = false
+        emit('otpDone', true );
+
+
+
+}
+
 </script>
 
 <template>
@@ -97,7 +114,7 @@ onBeforeUnmount(() => {
                 </div>
 
                 <!-- Verify OTP Button -->
-                <f7-button fill round large>Verify</f7-button>
+                <f7-button fill round large @click="goTo('/step-3')">Verify</f7-button>
 
                 <!-- Resend Code Prompt -->
                 <div>
