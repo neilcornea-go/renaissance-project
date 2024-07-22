@@ -186,7 +186,6 @@ const proceedDocuments = async () => {
                 console.log("verified documents", selectedFiles.value);
 
                 // storeDocument.persistDocument(selectedFiles.value)
-                localStorage.setItem('documents', JSON.stringify(selectedFiles.value))
                 console.log(storeDocument.document)
 
                 f7.dialog.confirm('Extract data now?', () => {
@@ -211,9 +210,38 @@ const extractDocuments = async () => {
         if (res.ok) {
             x.extracted_data = res.data
         }
+
+        if(i === (final_docs.length - 1)){            
+            // localStorage.setItem('documents_full', JSON.stringify(selectedFiles.value))
+            console.log('with json', selectedFiles.value)
+
+            moveDocuments(selectedFiles.value);
+
+        }
     }
-    console.log('with json', selectedFiles.value)
+    
 } 
+
+const moveDocuments = (data) => {
+    console.log(data)
+    var documents_basic = []
+    var df = data.final_documents
+    for(let i=0; i < df.length; i++){
+        // console.log(df[i].extracted_data.data.analyzeResult)
+        var d = df[i].extracted_data.data.analyzeResult.documents[0]
+        var x = {
+            docType: d.docType, 
+            confidence: d.confidence,
+            fields: d.fields}
+        documents_basic.push(x)
+    if(i === (df.length - 1)){
+        localStorage.setItem('documents_shortlist', JSON.stringify(documents_basic))
+        console.log('added documents_list in the localStorage')
+    }
+    }
+
+
+}
 </script>
 
 <template>
