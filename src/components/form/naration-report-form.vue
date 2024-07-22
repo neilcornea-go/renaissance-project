@@ -1,20 +1,44 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 const emit = defineEmits(['next', 'back']);
 
-// Form Input Components
 import InputDate from '../common/input-date.vue';
 import InputTextarea from '../common/input-textarea.vue';
-
 import FormHeader from '../common/form-header.vue';
+
+const formType = 'police-narration-report';
+
+const props = defineProps({
+    data: Object
+});
 
 // Form Data
 const FormData = ref({
-    datereport: null,
-    factscase: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+    pr_dor: null,
+    pr_facts_of_case: null,
 });
 
+const extractData = () => {
+    if (!props.data || !props.data.documents) {
+        return;
+    }
+    const matchingDoc = props.data.documents.find(doc => doc.docType === formType);
+    FormData.value.pr_facts_of_case = matchingDoc.fields.pr_facts_of_case.content;
+    FormData.value.pr_dor = formatDate(matchingDoc.fields.pr_dor.content);
+};
 
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+};
+
+onMounted(() => {
+    extractData();
+});
 </script>
 
 <template>
@@ -22,8 +46,8 @@ const FormData = ref({
     <FormHeader title="Police / narration report" link="https://www.google.com/" />
     <!-- Main Fields -->
     <div>
-        <InputDate type="date" v-model="FormData.datereport" label="Date of report" />
-        <InputTextarea v-model="FormData.factscase" label="Facts of case" placeholder="Type it here..." />
+        <InputDate type="date" v-model="FormData.pr_dor" label="Date of report" />
+        <InputTextarea v-model="FormData.pr_facts_of_case" label="Facts of case" placeholder="Type it here..." />
     </div>
 
     <!-- Action Button -->
