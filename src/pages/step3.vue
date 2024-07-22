@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { f7 } from 'framework7-vue';
 import GlobalLayout from '../components/structure/layout.vue';
 import StepIndicator from '../components/common/step.vue';
@@ -17,23 +17,32 @@ import MedicalCertificateForm from '../components/form/medical-certificate-form.
 import MarriageCertificateForm from '../components/form/marriage-certificate-form.vue';
 import DeathCertificateForm from '../components/form/death-certificate-form.vue';
 
-const identifiedClaims = ref('Death');
 const { claimsChecklist } = useStaticData();
-
+const data = ref([]);
+const identifiedClaims = ref('');
+const currentFormIndex = ref(0);
+const totalSteps = 3;
+const currentStep = computed(() => currentFormIndex.value + 1);
 const formComponents = {
     accident: [GovernmentIDForm, NarationReportForm, HospitalStatementForm],
     death: [GovernmentIDForm, DeathCertificateForm, MarriageCertificateForm],
     illness: [GovernmentIDForm, MedicalCertificateForm, HospitalStatementForm]
 };
 
-const currentFormIndex = ref(0);
-
-const currentStep = computed(() => currentFormIndex.value + 1);
-const totalSteps = 3;
+const renderData = () => {
+    try {
+        const getResponse = localStorage.getItem('documents_shortlist');
+        const parseResponse = JSON.parse(getResponse);
+        data.value = parseResponse;
+        identifiedClaims.value = data.value.claim_type;
+    } catch (error) {
+        console.error('Failed to render data:', error);
+    }
+};
 
 const currentFormComponent = computed(() => {
-    const claim = claimsChecklist.value.find(claim => claim.claim === identifiedClaims.value);
-    if (claim) {
+    const claim = claimsChecklist.value.find(claim => claim.key === identifiedClaims.value);
+    if (claim && formComponents[claim.key]) {
         return formComponents[claim.key][currentFormIndex.value];
     }
     return null;
@@ -41,14 +50,10 @@ const currentFormComponent = computed(() => {
 
 const progressValue = computed(() => {
     switch (currentStep.value) {
-        case 1:
-            return 20;
-        case 2:
-            return 60;
-        case 3:
-            return 100;
-        default:
-            return 0;
+        case 1: return 20;
+        case 2: return 60;
+        case 3: return 100;
+        default: return 0;
     }
 });
 
@@ -78,6 +83,10 @@ const goToPage = (route) => {
 const goProceedAPI = () => {
     alert('Go Proceed API');
 }
+
+onMounted(() => {
+    renderData();
+});
 </script>
 
 <template>
@@ -94,7 +103,7 @@ const goProceedAPI = () => {
 
             <div>
                 <!-- Dynamic Forms -->
-                <component :is="currentFormComponent" @next="handleNext" @back="handleBack" />
+                <component :data="data" :is="currentFormComponent" @next="handleNext" @back="handleBack" />
             </div>
         </section>
     </GlobalLayout>
