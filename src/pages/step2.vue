@@ -107,6 +107,8 @@ const doneOTP = (x) => {
         lead_disablement: selectedAccidentDisablement.value
         }
 
+        console.log(claimsData)
+
         console.log(JSON.parse(localStorage.getItem('form')))
         // get the form
         var getForm = JSON.parse(localStorage.getItem('form'))

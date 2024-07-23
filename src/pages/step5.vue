@@ -1,86 +1,246 @@
 <script setup>
-import { ref } from "vue";
-import GlobalLayout from "../components/structure/layout.vue";
-import ArticleCard from "../components/common/articleCard.vue";
-import Title from "../components/common/title.vue";
+
+import { onMounted, ref, computed } from 'vue';
+
+import GlobalLayout from '../components/structure/layout.vue';
+import StepIndicator from '../components/common/step.vue';
+import Title from '../components/common/title.vue';
+import Subtitle from '../components/common/subtitle.vue';
 import Divider from "../components/common/divider.vue";
+import { f7 } from 'framework7-vue';
+
+// Data Hook for Accident Section
+//step1
+const policy_number = ref('');
+//step2
+const inputValue = ref('');
+const dateValue = ref('');
+const selectedInjury = ref('Contusion Injury');
+const selectedBodyInjured = ref('Head');
+const selectedAccidentInvolve = ref('Yes');
+//step3
+const govID = ref('');
+const idNum = ref('');
+const firstName = ref(' ');
+const middleName = ref('');
+const lastname = ref('');
+const dob = ref('');
+const sex = ref('');
+const nationality = ref('');
+const pob = ref('');
+//step4
+const account_name = ref('')
+const bank_name = ref('')
+const bank_number = ref('')
+const type_of_account = ref('')
+
+const goTo = (route) => {
+        f7.views.main.router.navigate(route, {
+            animate: false
+        });
+
+}
+
+const NextPage = () => {
+
+goTo('/step-6');
+
+}
+
+
+
+
+onMounted(() => {
+    const savedData = localStorage.getItem('form');
+    if (savedData) {
+        // console.log(savedData)
+        const formData = JSON.parse(savedData);
+        console.log(formData)
+
+        //step Form
+        const step1Form = formData.policy_number
+        // console.log(step1Form)
+        const step2Form = formData.claim_details
+        const step3Form = formData.documents
+        const phPassport = step3Form.find(doc => doc.docType === 'ph-passport');
+        const step4Form = formData.bank_details
+
+        //step2
+
+        policy_number.value = formData.policy_number
+        dateValue.value = step2Form.accident_date;
+        inputValue.value = step2Form.accident_location;
+        selectedInjury.value = step2Form.injury_type;
+        selectedBodyInjured.value = step2Form.injured_part;
+        selectedAccidentInvolve.value = step2Form.confined_accident;
+
+        //step3
+
+        // Check if the document was found
+        if (phPassport) {
+            console.log('PH Passport Details:', phPassport);
+
+            idNum.value = phPassport.govt_id
+            firstName.value = phPassport.fname
+            middleName.value = phPassport.mname
+            lastname.value = phPassport.lname
+            dob.value = phPassport.dob
+            sex.value = phPassport.sex
+            nationality.value = phPassport.nationality
+            pob.value = phPassport.pob
+
+        } else {
+            console.log('PH Passport not found');
+        }
+
+        //step4 
+        account_name.value = step4Form.account_name
+        bank_name.value = step4Form.bank_name
+        bank_number.value = step4Form.bank_number
+        type_of_account.value = step4Form.type_of_account
+
+        
+
+    }
+
+})
+
 </script>
 
 <template>
     <GlobalLayout fullWidth>
         <section class="flex flex-col gap-8 py-6 px-6 max-w-screen-lg mx-auto">
-            <div class="space-y-2">
-                <f7-block class="text-center">
-                    <svg class="w-20 h-20 text-gray-800 dark:text-white mx-auto" aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.4"
-                            d="m13.46 8.291 3.849-3.849a1.5 1.5 0 0 1 2.122 0l.127.127a1.5 1.5 0 0 1 0 2.122l-3.84 3.838a4 4 0 0 0-2.258-2.238Zm0 0a4 4 0 0 1 2.263 2.238l3.662-3.662a8.961 8.961 0 0 1 0 10.27l-3.676-3.676m-2.25-5.17 3.678-3.676a8.961 8.961 0 0 0-10.27 0l3.662 3.662a4 4 0 0 0-2.238 2.258L4.615 6.863a8.96 8.96 0 0 0 0 10.27l3.662-3.662a4 4 0 0 0 2.258 2.238l-3.672 3.676a8.96 8.96 0 0 0 10.27 0l-3.662-3.662a4.001 4.001 0 0 0 2.238-2.262m0 0 3.849 3.848a1.5 1.5 0 0 1 0 2.122l-.127.126a1.499 1.499 0 0 1-2.122 0l-3.838-3.838a4 4 0 0 0 2.238-2.258Zm.29-1.461a4 4 0 1 1-8 0 4 4 0 0 1 8 0Zm-7.718 1.471-3.84 3.838a1.5 1.5 0 0 0 0 2.122l.128.126a1.5 1.5 0 0 0 2.122 0l3.848-3.848a4 4 0 0 1-2.258-2.238Zm2.248-5.19L6.69 4.442a1.5 1.5 0 0 0-2.122 0l-.127.127a1.5 1.5 0 0 0 0 2.122l3.849 3.848a4 4 0 0 1 2.238-2.258Z" />
-                    </svg>
-                    <Title title="You've Submitted Your Claims" class="pt-4" />
-                    <p class="pt-2">
-                        If your claim is approved, we'll credit to your nominated payout
-                        details.
-                    </p>
-                </f7-block>
-
-                <f7-card class="bg-[#f1f1f1] py-4 md:w-9/12 mx-auto group">
-                    <f7-card-content>
-                        <a href="#" class="flex justify-between">
-                            <p>Claim reference number(s)</p>
-                            <svg class="w-6 h-6 text-gray-800 dark:text-white opacity-0 absolute right-5 transition-opacity duration-300 group-hover:opacity-100" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                                viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="m9 5 7 7-7 7" />
-                            </svg>
-                        </a>
-                        <h3 class="text-xl font-medium">ACM000193682</h3>
-                        <h3 class="text-xl font-medium">ACM000193682</h3>
-                        <Divider />
-
-                        <p class="flex mx-auto">
-                            <svg class="w-6 h-6 text-gray-800 dark:text-white pr-1" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                                viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="1.4" d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>Keep the original receipts for the next 120 days in case we need
-                            to verify your claim.
-                        </p>
-                    </f7-card-content>
-                </f7-card>
-
-                <div class="py-4">
-                    <f7-button fill round large class="md:w-9/12 mx-auto">DONE</f7-button>
-                </div>
-
-                <div class="text-center pb-4">
-                    <f7-link class="" href="http://google.com" external target="_blank">
-                        <h2 class="uppercase text-base underline text-blue-700 font-light">
-                            Submit a new claim
-                        </h2>
-                    </f7-link>
-                </div>
-
-
+            <!-- Steps Indicator -->
+            <div class="space-y-1">
+                <StepIndicator step="5" />
+                <Title title="Review Summary" />
+                <Subtitle subtitle="Please review summary before proceeding" />
             </div>
+
         </section>
 
-        <section class="bg-[#f1f1f1] ">
+        <section class="bg-[#f1f1f1]">
             <div class="py-6 px-6 max-w-screen-lg mx-auto">
-                <Title title="Featured Reads" />
+                <div class="space-y-2 flex justify-between items-center text-center">
+                    <Title title="Claims Details" class="!text-xl" />
 
-                <ArticleCard title="Article Title"
-                    content="Egestas elit dui scelerisque ut eu purus aliquam vitae habitasse" category="Accident"
-                    url="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" />
-                <ArticleCard title="Article Title"
-                    content="Egestas elit dui scelerisque ut eu purus aliquam vitae habitasse" category="Accident"
-                    url="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" />
-                <ArticleCard title="Article Title"
-                    content="Egestas elit dui scelerisque ut eu purus aliquam vitae habitasse" category="Accident"
-                    url="https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png" />
+                    <a href="/step-2">
+                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10.779 17.779 4.36 19.918 6.5 13.5m4.279 4.279 8.364-8.643a3.027 3.027 0 0 0-2.14-5.165 3.03 3.03 0 0 0-2.14.886L6.5 13.5m4.279 4.279L6.499 13.5m2.14 2.14 6.213-6.504M12.75 7.04 17 11.28" />
+                        </svg>
+                    </a>
+
+                </div>
+                <div class="py-2">
+                    <p>Policy Number</p>
+                    <h3 class="font-bold">{{ policy_number }}</h3>
+                </div>
+
+                <div class="py-2">
+                    <p>Accident Date</p>
+                    <h3 class="font-bold">{{ dateValue }}</h3>
+                </div>
+
+                <div class="py-2">
+                    <p>Accident Location</p>
+                    <h3 class="font-bold">{{ inputValue }}</h3>
+                </div>
+
+                <div class="py-2">
+                    <p>Injury Type</p>
+                    <h3 class="font-bold">{{ selectedInjury }}</h3>
+                </div>
+
+                <div class="py-2">
+                    <p>Part of body injured</p>
+                    <h3 class="font-bold">{{ selectedBodyInjured }}</h3>
+                </div>
+
+                <div class="pt-2">
+                    <p>Did the accident involved confinement, surgery, or dismemberment?</p>
+                    <h3 class="font-bold">{{ selectedAccidentInvolve }}</h3>
+                </div>
+
+                <Divider class="bg-black" />
+
+                <div class="pb-2">
+                    <p>Type of Government ID</p>
+                    <h3 class="font-bold">Passport</h3>
+                </div>
+
+                <div class="py-2">
+                    <p>ID No.</p>
+                    <h3 class="font-bold">{{ idNum }}</h3>
+                </div>
+
+                <div class="py-2">
+                    <p>First Name</p>
+                    <h3 class="font-bold">{{ firstName }}</h3>
+                </div>
+
+                <div class="py-2">
+                    <p>Middle Name</p>
+                    <h3 class="font-bold">{{ middleName }}</h3>
+                </div>
+
+                <div class="py-2">
+                    <p>Last Name</p>
+                    <h3 class="font-bold">{{ lastname }}</h3>
+                </div>
+
+                <div class="py-2">
+                    <p>Date of birth</p>
+                    <h3 class="font-bold">{{ dob }}</h3>
+                </div>
+
+                <div class="py-2">
+                    <p>Sex</p>
+                    <h3 class="font-bold">{{ sex }}</h3>
+                </div>
+
+                <div class="py-2">
+                    <p>Nationality</p>
+                    <h3 class="font-bold">{{ nationality }}</h3>
+                </div>
+
+                <div class="pt-2">
+                    <p>Place of birth</p>
+                    <h3 class="font-bold">{{ pob }}</h3>
+                </div>
+
+                <Divider class="bg-black" />
+
+                <div class="pb-2">
+                    <p>Account Name</p>
+                    <h3 class="font-bold">{{ account_name }}</h3>
+                </div>
+
+                <div class="py-2">
+                    <p>Bank Account Number</p>
+                    <h3 class="font-bold">{{ bank_number}}</h3>
+                </div>
+
+                <div class="py-2">
+                    <p>Bank Name</p>
+                    <h3 class="font-bold">{{ bank_name }}</h3>
+                </div>
+
+                <div class="py-2">
+                    <p>Type of Account</p>
+                    <h3 class="font-bold">{{type_of_account}}</h3>
+                </div>
+
+                <div class="py-4 space-y-3">
+                    <f7-button fill round large class="md:w-9/12 mx-auto uppercase" @click="NextPage()">Submit Claim</f7-button>
+                    <f7-button outline round large href="/step-4" class="md:w-9/12 mx-auto uppercase">Back</f7-button>
+                </div>
             </div>
+
         </section>
+
+
 
 
     </GlobalLayout>
