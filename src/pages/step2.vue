@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import GlobalLayout from '../components/structure/layout.vue';
 import StepIndicator from '../components/common/step.vue';
 import Title from '../components/common/title.vue';
@@ -7,6 +7,7 @@ import Subtitle from '../components/common/subtitle.vue';
 import Divider from '../components/common/divider.vue';
 import OTPModal from '../components/main/otp-modal.vue';
 import ClaimsInfo from '../components/main/claims-info.vue';
+import { f7 } from 'framework7-vue';
 
 // Form Input Components
 import InputText from '../components/common/input-text.vue';
@@ -19,8 +20,8 @@ import { useStaticData } from '../composable/useStaticData';
 const { typeInjuryOptions, partBodyInjuredOptions, mainCheckboxOptions, natureDeathOptions, relationshipOptions } = useStaticData();
 
 // Data Hook
-const inputValue = ref('');
-const dateValue = ref('');
+const accidentPOI = ref('');
+const accidentDate = ref('');
 const isOpenOTP = ref(false);
 const selectedInjury = ref('Contusion Injury');
 const selectedBodyInjured = ref('Head');
@@ -28,6 +29,97 @@ const selectedAccidentInvolve = ref('Yes');
 const selectedAccidentDisablement = ref('Yes');
 const selectedNatureDeath = ref('Illness');
 const selectedRelationship = ref('Spouse');
+const data = ref({})
+
+onMounted(() => {
+    renderData();
+});
+
+
+const renderData = async () => {
+    try {
+        const getResponse = await localStorage.getItem('documents_shortlist');
+        data.value = JSON.parse(getResponse);
+        console.log(data.value)
+        passValues();
+    }
+    catch (error) {
+        console.error('Failed to render data:', error)
+    }
+}
+
+const passValues = async() => {
+    if(data.value.claim_type === 'accident'){
+        console.log('accident')
+        // accidentDate.value = documents[1].fields.pr_dor.content;
+
+    const x = await data.value.documents.map(e => {
+        if(e.docType === 'police-narration-report'){
+            return {pr_dor: e.fields.pr_dor.content, pr_poi: e.fields.pr_poi.content};
+        }
+        else return ''
+    })
+
+
+    var y =  (x.filter(function (item){
+        if(item !== ''){
+            return x
+        }
+    }))[0]
+
+    
+    // var edit = y.substring(0, y.length-1)
+    console.log(y.pr_dor)
+    accidentDate.value = formatDate(y.pr_dor)
+    accidentPOI.value = y.pr_poi
+    }
+}
+
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
+};
+
+const handleBack = () => {
+        goTo('/step-1');
+}
+
+const goTo = (route) => {
+        f7.views.main.router.navigate(route, {
+            animate: false
+        });
+
+}
+
+const doneOTP = (x) => {
+    if(x){
+        var claimsData = {
+        claim_type: data.value.claim_type,
+        accident_date: accidentDate.value,
+        accident_location: accidentPOI.value,
+        injury_type: selectedInjury.value,
+        injured_part: selectedBodyInjured.value,
+        confined_accident: selectedAccidentInvolve.value,
+        lead_disablement: selectedAccidentDisablement.value
+        }
+
+        console.log(JSON.parse(localStorage.getItem('form')))
+        // get the form
+        var getForm = JSON.parse(localStorage.getItem('form'))
+        // add a content in the claim details in form
+        getForm.claim_details = {...claimsData}
+        // remove first what is in localstorage
+        localStorage.removeItem('form');        
+        //then set again the new form
+        localStorage.setItem('form', JSON.stringify(getForm))
+        console.log(getForm)
+    }
+}
+
 </script>
 
 <template>
@@ -42,13 +134,13 @@ const selectedRelationship = ref('Spouse');
             </div>
 
             <!-- Claims Info -->
-            <ClaimsInfo type="accident" />
+            <ClaimsInfo :type="data.claim_type" />
 
             <!-- Edit Result Form - Accident Claims -->
             <div class="flex flex-col">
                 <!-- Inputs -->
-                <InputDate type="date" v-model="dateValue" label="Accident date" />
-                <InputText v-model="inputValue" label="Accident Location" placeholder="Enter accident location" />
+                <InputDate type="date" v-model="accidentDate" label="Accident date" />
+                <InputText v-model="accidentPOI" label="Accident Location" placeholder="Enter accident location" />
 
                 <!-- Injury Type Dropdown -->
                 <Dropdown v-model="selectedInjury" label="Injury type" :data="typeInjuryOptions" />
@@ -100,12 +192,12 @@ const selectedRelationship = ref('Spouse');
             </div>
 
             <!-- OTP Popup -->
-            <OTPModal :isOpen="isOpenOTP" @update:isOpen="isOpenOTP = $event" />
+            <OTPModal :isOpen="isOpenOTP" @otpDone="doneOTP" @update:isOpen="isOpenOTP = $event" />
 
             <!-- Action Button -->
             <div class="bg-white my-3 space-y-4">
                 <f7-button fill round large @click="isOpenOTP = true">Next</f7-button>
-                <f7-button outline round large>Back</f7-button>
+                <f7-button outline round large @click="handleBack()">Back</f7-button>
             </div>
         </section>
     </GlobalLayout>

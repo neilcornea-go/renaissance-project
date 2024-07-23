@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import GlobalLayout from "../components/structure/layout.vue";
 import StepIndicator from "../components/common/step.vue";
 import Title from "../components/common/title.vue";
@@ -24,9 +24,15 @@ import {
 import { useDocumentsStore } from "../../src/js/stores/documents.js"
 const storeDocument = useDocumentsStore();
 
-const inputValue = ref("");
+const policyNumber = ref("");
 const selectedFiles = ref({});
 const classified = ref(false);
+const dataExtracted = ref(false)
+
+onMounted(() => {
+
+    jumpNext();
+});
 
 const getDocuments = async () => {
     console.log(selectedFiles.value.documents);
@@ -222,6 +228,26 @@ const extractDocuments = async () => {
     
 } 
 
+const jumpNext = () => {   
+
+    // // console.log(localStorage.getItem('documents_shortlist'))
+    if(localStorage.getItem('documents_shortlist') !== undefined){
+        dataExtracted.value = true
+    //     var route = '/step-2'
+    //     f7.views.main.router.navigate(route, {
+    //         animate: false
+    //     });
+    }
+}
+
+const goTo = (route) => {
+        f7.views.main.router.navigate(route, {
+            animate: false
+        });
+
+}
+
+
 const moveDocuments = (data) => {
     console.log(data)
     var documents_basic = []
@@ -235,8 +261,22 @@ const moveDocuments = (data) => {
             fields: d.fields}
         documents_basic.push(x)
     if(i === (df.length - 1)){
-        localStorage.setItem('documents_shortlist', JSON.stringify(documents_basic))
+        var data = {claim_type: data.claim_type, documents: documents_basic}
+        localStorage.setItem('documents_shortlist', JSON.stringify(data))
         console.log('added documents_list in the localStorage')
+
+        var form = {
+            claim_type: data.claim_type, 
+            policy_number: policyNumber.value,
+            claim_details: {},
+            documents: documents_basic,
+            bank_details: {}
+        }
+        localStorage.setItem('form', JSON.stringify(form))
+
+        goTo('/step-2')
+
+
     }
     }
 
@@ -258,7 +298,7 @@ const moveDocuments = (data) => {
             <!-- Upload Documents -->
             <div class="flex flex-col gap-4">
                 <!-- Policy Number Input -->
-                <InputText v-model="inputValue" label="Policy number" placeholder="e.g. 123456789B" />
+                <InputText v-model="policyNumber" label="Policy number" placeholder="e.g. 123456789B" />
 
                 <Divider />
 
@@ -331,6 +371,11 @@ const moveDocuments = (data) => {
                     <f7-button v-if="classified" fill round large @click="proceedDocuments()">Verify</f7-button>
                     <f7-button v-else :disabled="!classified && Object.keys(selectedFiles).length === 0" fill round
                         large @click="getDocuments()">Classify</f7-button>
+                </div>
+
+                
+                <div class="bg-white my-3" v-if="dataExtracted">
+                    <f7-button fill round large @click="goTo('/step-2')">Step 2</f7-button>
                 </div>
 
             </div>
