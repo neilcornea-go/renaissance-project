@@ -93,7 +93,7 @@ const claimsChecklist = ref([
             policyNumber: '123456',
             bank_name: 'BPI',
             account_name: 'Test 1',
-            account_number: '899991',
+            account_number: '1234567890',
             type_of_account: 'Current Account1',
         },
         {
@@ -101,7 +101,7 @@ const claimsChecklist = ref([
             policyNumber: '246810',
             bank_name: 'BPI',
             account_name: 'Test 2',
-            account_number: '899992',
+            account_number: '2345678901',
             type_of_account: 'Current Account2',
         },
 
@@ -110,7 +110,7 @@ const claimsChecklist = ref([
             policyNumber: '135790',
             bank_name: 'Public Bank',
             account_name: 'Test 3',
-            account_number: '899993',
+            account_number: '3456789012',
             type_of_account: 'Current Account3',
         },
 
@@ -119,7 +119,7 @@ const claimsChecklist = ref([
             policyNumber: '357890',
             bank_name: 'BPI',
             account_name: 'Test 4',
-            account_number: '899994',
+            account_number: '4567890123',
             type_of_account: 'Current Account4',
         },
 
@@ -128,7 +128,7 @@ const claimsChecklist = ref([
             policyNumber: '987654',
             bank_name: 'BPI',
             account_name: 'Test 5',
-            account_number: '899995',
+            account_number: '5678901234',
             type_of_account: 'Current Account5',
         },
     
