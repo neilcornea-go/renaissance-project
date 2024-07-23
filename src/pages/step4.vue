@@ -22,7 +22,6 @@ const inputAccountName = ref('');
 const inputBankAccount = ref('');
 const selectedBankName = ref(null);
 const selectedTypeOfAccount = ref(null);
-const isAccountNumberVisible = ref(false);
 
 const renderData = () => {
     const matchingDetails = bankDetails.value.find(data => data.policyNumber === policy_number);
@@ -30,9 +29,7 @@ const renderData = () => {
     inputBankAccount.value = matchingDetails.account_number;
     selectedBankName.value = matchingDetails.bank_name;
     selectedTypeOfAccount.value = matchingDetails.type_of_account;
-    console.log(matchingDetails);
 };
-
 
 onMounted(() => {
     renderData();
@@ -60,7 +57,7 @@ onMounted(() => {
                 <!-- Inputs -->
                 <InputText v-model="inputAccountName" label="Account name" placeholder="e.g. John Smith" />
 
-                <InputText v-model="inputBankAccount" label="Bank account number" placeholder="e.g. 865301828712" />
+                <InputText masked v-model="inputBankAccount" label="Bank account number" placeholder="e.g. 865301828712" />
 
                 <!-- Bank name Dropdown -->
                 <Dropdown v-model="selectedBankName" label="Bank name" :data="bankNameOptions" />
