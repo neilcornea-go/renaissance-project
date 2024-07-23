@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import GlobalLayout from '../components/structure/layout.vue';
 import StepIndicator from '../components/common/step.vue';
 import Title from '../components/common/title.vue';
@@ -15,12 +15,28 @@ import Checkbox from '../components/common/checkbox.vue';
 // Composable
 import { useStaticData } from '../composable/useStaticData';
 
-const { bankNameOptions, typeOfAccountOptions } = useStaticData();
+const { bankNameOptions, typeOfAccountOptions, bankDetails } = useStaticData();
 
+const policy_number = '123456';
 const inputAccountName = ref('');
 const inputBankAccount = ref('');
-const selectedBankName = ref('Public Bank');
-const selectedTypeOfAccount = ref('Current account');
+const selectedBankName = ref(null);
+const selectedTypeOfAccount = ref(null);
+const isAccountNumberVisible = ref(false);
+
+const renderData = () => {
+    const matchingDetails = bankDetails.value.find(data => data.policyNumber === policy_number);
+    inputAccountName.value = matchingDetails.account_name;
+    inputBankAccount.value = matchingDetails.account_number;
+    selectedBankName.value = matchingDetails.bank_name;
+    selectedTypeOfAccount.value = matchingDetails.type_of_account;
+    console.log(matchingDetails);
+};
+
+
+onMounted(() => {
+    renderData();
+});
 
 </script>
 
