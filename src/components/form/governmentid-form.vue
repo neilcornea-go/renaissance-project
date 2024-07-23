@@ -26,15 +26,15 @@ const props = defineProps({
 
 // Form Data
 const FormData = ref({
-    gov_id_type: null,
-    pp_passportno: null,
-    pp_fname: null,
-    pp_mname: null,
-    pp_lname: null,
-    pp_dob: null,
-    pp_sex: null,
-    pp_nationality: null,
-    pp_pob: null,
+    docType: formType,
+    govt_id: null,
+    fname: null,
+    mname: null,
+    lname: null,
+    dob: null,
+    sex: null,
+    nationality: null,
+    pob: null,
 });
 
 const extractData = () => {
@@ -45,16 +45,17 @@ const extractData = () => {
 
     if (matchingDoc && matchingDoc.fields) {
         const updatedData = {
-            gov_id_type: identifyGovType(matchingDoc.docType) || null,
-            pp_passportno: matchingDoc.fields.pp_passportno?.content || 'N/A',
-            pp_fname: toSentenceCase(matchingDoc.fields.pp_fname?.content) || 'N/A',
-            pp_mname: toSentenceCase(matchingDoc.fields.pp_mname?.content) || 'N/A',
-            pp_lname: toSentenceCase(matchingDoc.fields.pp_lname?.content) || 'N/A',
-            pp_dob: formatDate(matchingDoc.fields.pp_dob?.content) || 'N/A',
-            pp_sex: matchingDoc.fields.pp_sex?.content === 'M' ? 'Male' :
-                matchingDoc.fields.pp_sex?.content === 'F' ? 'Female' : 'N/A',
-            pp_nationality: toSentenceCase(matchingDoc.fields.pp_nationality?.content) || 'N/A',
-            pp_pob: toSentenceCase(matchingDoc.fields.pp_pob?.content) || 'N/A',
+            docType: matchingDoc.docType || null,
+            docName: identifyGovType(matchingDoc.docType),
+            govt_id: matchingDoc.fields.govt_id?.content || 'N/A',
+            fname: toSentenceCase(matchingDoc.fields.fname?.content) || 'N/A',
+            mname: toSentenceCase(matchingDoc.fields.mname?.content) || 'N/A',
+            lname: toSentenceCase(matchingDoc.fields.lname?.content) || 'N/A',
+            dob: formatDate(matchingDoc.fields.dob?.content) || 'N/A',
+            sex: matchingDoc.fields.sex?.content === 'M' ? 'Male' :
+                matchingDoc.fields.sex?.content === 'F' ? 'Female' : 'N/A',
+            nationality: toSentenceCase(matchingDoc.fields.nationality?.content) || 'N/A',
+            pob: toSentenceCase(matchingDoc.fields.pob?.content) || 'N/A',
         };
 
         FormData.value = { ...FormData.value, ...updatedData };
@@ -103,6 +104,24 @@ onMounted(() => {
     extractData();
 });
 
+const nextForm = () => {    
+    emit('next')
+
+    console.log(JSON.parse(localStorage.getItem('form')))
+        // get the form
+        var getForm = JSON.parse(localStorage.getItem('form'))
+        // remove first what is in localstorage
+        localStorage.removeItem('form');  
+        // filter the documents to remove prior saved
+        getForm.documents = getForm.documents.filter(function( obj ) {return obj.docType !== formType;})
+        // add a content in the claim details in form
+        getForm.documents.push(FormData.value)      
+        //then set again the new form
+        localStorage.setItem('form', JSON.stringify(getForm))
+        console.log(getForm)
+    
+}
+
 </script>
 
 <template>
@@ -110,20 +129,20 @@ onMounted(() => {
 
     <!-- Main Fields -->
     <div>
-        <InputText disabled v-model="FormData.gov_id_type" label="Type of Government ID" placeholder="e.g. Passport" />
-        <InputText v-model="FormData.pp_passportno" label="ID No." placeholder="ID No." />
-        <InputText v-model="FormData.pp_fname" label="First Name" placeholder="First Name" />
-        <InputText v-model="FormData.pp_mname" label="Middle Name" placeholder="Middle Name" />
-        <InputText v-model="FormData.pp_lname" label="Last Name" placeholder="Last Name" />
-        <InputDate type="date" v-model="FormData.pp_dob" label="Date of birth" />
-        <Dropdown v-model="FormData.pp_sex" label="Sex" :data="genderOptions" />
-        <Dropdown v-model="FormData.pp_nationality" label="Nationality" :data="nationalityOptions" />
-        <InputText v-model="FormData.pp_pob" label="Place of Birth" placeholder="Place of Birth" />
+        <InputText disabled v-model="FormData.docName" label="Type of Government ID" placeholder="e.g. Passport" />
+        <InputText v-model="FormData.govt_id" label="ID No." placeholder="ID No." />
+        <InputText v-model="FormData.fname" label="First Name" placeholder="First Name" />
+        <InputText v-model="FormData.mname" label="Middle Name" placeholder="Middle Name" />
+        <InputText v-model="FormData.lname" label="Last Name" placeholder="Last Name" />
+        <InputDate type="date" v-model="FormData.dob" label="Date of birth" />
+        <Dropdown v-model="FormData.sex" label="Sex" :data="genderOptions" />
+        <Dropdown v-model="FormData.nationality" label="Nationality" :data="nationalityOptions" />
+        <InputText v-model="FormData.pob" label="Place of Birth" placeholder="Place of Birth" />
     </div>
 
     <!-- Action Button -->
     <div class="space-y-4">
-        <f7-button fill round large @click="$emit('next')">Next</f7-button>
+        <f7-button fill round large @click="nextForm()">Next</f7-button>
         <f7-button outline round large @click="$emit('back')">Back</f7-button>
     </div>
 </template>
