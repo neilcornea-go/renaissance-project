@@ -1,12 +1,17 @@
 import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getStorage, uploadString } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBLVmK5yzwQ4_IRvZMbEeTHhID_a3yc7tE",
-  authDomain: "renaissance-6618d.firebaseapp.com",
-  projectId: "renaissance-6618d",
-  storageBucket: "renaissance-6618d.appspot.com",
-  messagingSenderId: "842098757802",
-  appId: "1:842098757802:web:313d6f769d4bc52cc7c0d3"
+  apiKey: __FIREBASE_API_KEY__,
+  authDomain: __FIREBASE_AUTH_DOMAIN__,
+  projectId: __FIREBASE_PROJECT_ID__,
+  storageBucket: __FIREBASE_STORAGE_BUCKET__,
+  messagingSenderId: __FIREBASE_MESSAGING_SENDER_ID__,
+  appId: __FIREBASE_APP_ID__,
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+export const database = getFirestore(app);
+export const storage = getStorage(app);

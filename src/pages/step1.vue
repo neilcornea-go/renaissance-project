@@ -11,6 +11,7 @@ import ChecklistPopup from "../components/main/checklist-popup.vue";
 // Form Input Components
 import InputText from "../components/common/input-text.vue";
 import InputFile from "../components/common/input-file.vue";
+import InputFile2 from "../components/common/input-file-2.vue";
 
 import { f7 } from 'framework7-vue';
 
@@ -20,6 +21,8 @@ import {
     getExtractedDocument
 } from "../../src/js/hooks/documentClassifierAnalysis.js";
 
+import { storage } from '../js/firebase';
+import { ref as fileRef, uploadString } from "firebase/storage";
 
 import { useDocumentsStore } from "../../src/js/stores/documents.js"
 const storeDocument = useDocumentsStore();
@@ -217,7 +220,7 @@ const extractDocuments = async () => {
             x.extracted_data = res.data
         }
 
-        if(i === (final_docs.length - 1)){            
+        if (i === (final_docs.length - 1)) {
             // localStorage.setItem('documents_full', JSON.stringify(selectedFiles.value))
             console.log('with json', selectedFiles.value)
 
@@ -225,25 +228,25 @@ const extractDocuments = async () => {
 
         }
     }
-    
-} 
 
-const jumpNext = () => {   
+}
+
+const jumpNext = () => {
 
     // // console.log(localStorage.getItem('documents_shortlist'))
-    if(localStorage.getItem('documents_shortlist') !== undefined){
+    if (localStorage.getItem('documents_shortlist') !== undefined) {
         dataExtracted.value = true
-    //     var route = '/step-2'
-    //     f7.views.main.router.navigate(route, {
-    //         animate: false
-    //     });
+        //     var route = '/step-2'
+        //     f7.views.main.router.navigate(route, {
+        //         animate: false
+        //     });
     }
 }
 
 const goTo = (route) => {
-        f7.views.main.router.navigate(route, {
-            animate: false
-        });
+    f7.views.main.router.navigate(route, {
+        animate: false
+    });
 
 }
 
@@ -252,18 +255,19 @@ const moveDocuments = (data) => {
     console.log(data)
     var documents_basic = []
     var df = data.final_documents
-    for(let i=0; i < df.length; i++){
+    for (let i = 0; i < df.length; i++) {
         // console.log(df[i].extracted_data.data.analyzeResult)
         var d = df[i].extracted_data.data.analyzeResult.documents[0]
         var x = {
-            docType: d.docType, 
+            docType: d.docType,
             confidence: d.confidence,
-            fields: d.fields}
+            fields: d.fields
+        }
         documents_basic.push(x)
-    if(i === (df.length - 1)){
-        var data = {claim_type: data.claim_type, documents: documents_basic}
-        localStorage.setItem('documents_shortlist', JSON.stringify(data))
-        console.log('added documents_list in the localStorage')
+        if (i === (df.length - 1)) {
+            var data = { claim_type: data.claim_type, documents: documents_basic }
+            localStorage.setItem('documents_shortlist', JSON.stringify(data))
+            console.log('added documents_list in the localStorage')
 
         var form = {
             claim_type: data.claim_type, 
@@ -274,14 +278,33 @@ const moveDocuments = (data) => {
         }
         localStorage.setItem('form', JSON.stringify(form))
 
-        goTo('/step-2')
+            goTo('/step-2')
 
 
+        }
     }
-    }
-
-
 }
+
+const uploadStorage = async () => {
+    const cloudStorage = storage;
+
+    console.log(selectedFiles.value);
+    
+    if (!Array.isArray(selectedFiles.value) || selectedFiles.value.length === 0) return;
+
+    for (const fileObj of selectedFiles.value) {
+        const { base64, extension } = fileObj;
+        const fileName = `docs_${Date.now()}.${extension}`;
+        const storageRef = fileRef(cloudStorage, fileName);
+
+        try {
+            const snapshot = await uploadString(storageRef, base64, 'base64');
+            console.log(`Uploaded ${fileName}:`, snapshot);
+        } catch (error) {
+            console.error(`Error uploading ${fileName}:`, error);
+        }
+    }
+};
 </script>
 
 <template>
@@ -323,6 +346,9 @@ const moveDocuments = (data) => {
                 <!-- Click to Upload Action -->
                 <div class="space-y-2">
                     <InputFile v-model="selectedFiles" multiple />
+
+                    <p class="font-bold text-gray-600">Testing Upload File</p>
+                    <InputFile2 v-model="selectedFiles" multiple />
                     <span class="text-gray-500">Supported files: doc, docx, pdf, jpg (max. 5MB)</span>
                 </div>
 
@@ -373,10 +399,12 @@ const moveDocuments = (data) => {
                         large @click="getDocuments()">Classify</f7-button>
                 </div>
 
-                
+
                 <div class="bg-white my-3" v-if="dataExtracted">
                     <f7-button fill round large @click="goTo('/step-2')">Step 2</f7-button>
                 </div>
+
+                <f7-button fill round large @click="uploadStorage()">Upload Storage</f7-button>
 
             </div>
         </section>

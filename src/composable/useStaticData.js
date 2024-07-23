@@ -131,7 +131,6 @@ const claimsChecklist = ref([
             account_number: '5678901234',
             type_of_account: 'Current Account5',
         },
-    
 ]);
 
 export function useStaticData() {
