@@ -269,7 +269,7 @@ const moveDocuments = (data) => {
             claim_type: data.claim_type, 
             policy_number: policyNumber.value,
             claim_details: {},
-            documents: documents_basic,
+            documents: [],
             bank_details: {}
         }
         localStorage.setItem('form', JSON.stringify(form))

@@ -14,7 +14,9 @@ const props = defineProps({
 
 // Form Data
 const FormData = ref({
+    docType: formType,
     pr_dor: null,
+    pr_poi: null,
     pr_facts_of_case: null,
 });
 
@@ -25,6 +27,7 @@ const extractData = () => {
     const matchingDoc = props.data.documents.find(doc => doc.docType === formType);
     FormData.value.pr_facts_of_case = matchingDoc.fields.pr_facts_of_case.content;
     FormData.value.pr_dor = formatDate(matchingDoc.fields.pr_dor.content);
+    FormData.value.pr_poi = matchingDoc.fields.pr_poi.content;
 };
 
 const formatDate = (dateString) => {
@@ -39,6 +42,24 @@ const formatDate = (dateString) => {
 onMounted(() => {
     extractData();
 });
+
+const nextForm = () => {    
+    emit('next')
+
+    console.log(JSON.parse(localStorage.getItem('form')))
+        // get the form
+        var getForm = JSON.parse(localStorage.getItem('form'))
+        // remove first what is in localstorage
+        localStorage.removeItem('form'); 
+        // filter the documents to remove prior saved
+        getForm.documents = getForm.documents.filter(function( obj ) {return obj.docType !== formType;})
+        // add a content in the claim details in form
+        getForm.documents.push(FormData.value)       
+        //then set again the new form
+        localStorage.setItem('form', JSON.stringify(getForm))
+        console.log(getForm)
+    
+}
 </script>
 
 <template>
@@ -52,7 +73,7 @@ onMounted(() => {
 
     <!-- Action Button -->
     <div class="space-y-4">
-        <f7-button fill round large @click="$emit('next')">Next</f7-button>
+        <f7-button fill round large @click="nextForm()">Next</f7-button>
         <f7-button outline round large @click="$emit('back')">Back</f7-button>
     </div>
 </template>
