@@ -108,8 +108,14 @@ const doneOTP = (x) => {
         }
 
         console.log(JSON.parse(localStorage.getItem('form')))
+        // get the form
         var getForm = JSON.parse(localStorage.getItem('form'))
+        // add a content in the claim details in form
         getForm.claim_details = {...claimsData}
+        // remove first what is in localstorage
+        localStorage.removeItem('form');        
+        //then set again the new form
+        localStorage.setItem('form', JSON.stringify(getForm))
         console.log(getForm)
     }
 }
