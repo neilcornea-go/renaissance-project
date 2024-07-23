@@ -15,17 +15,21 @@ const partBodyInjuredOptions = ref([
     { id: '5', option: 'Nose' }
 ]);
 
-const typeOfAccountOptions = ref([
-    { id: '1', option: 'Current account' },
-    { id: '2', option: 'Current account2' },
-    { id: '3', option: 'Current account3' },
-
-]);
 
 const bankNameOptions = ref([
     { id: '1', option: 'Public Bank' },
     { id: '2', option: 'Public Bank2' },
     { id: '3', option: 'Public Bank3' },
+    { id: '4', option: 'BPI' },
+
+]);
+
+const typeOfAccountOptions = ref([
+    { id: '1', option: 'Current Account1' },
+    { id: '2', option: 'Current Account2' },
+    { id: '3', option: 'Current Account3' },
+    { id: '4', option: 'Current Account4' },
+    { id: '5', option: 'Current Account5' },
 
 ]);
 
@@ -80,11 +84,59 @@ const claimsChecklist = ref([
             'hospital_statement',
             'medical_certificate'
         ]
-    }
+    },
+]);
+    
+    const bankDetails = ref([
+        {
+            id: '1',
+            policyNumber: '123456',
+            bank_name: 'BPI',
+            account_name: 'Test 1',
+            account_number: '899991',
+            type_of_account: 'Current Account1',
+        },
+        {
+            id: '2',
+            policyNumber: '246810',
+            bank_name: 'BPI',
+            account_name: 'Test 2',
+            account_number: '899992',
+            type_of_account: 'Current Account2',
+        },
+
+        {
+            id: '3',
+            policyNumber: '135790',
+            bank_name: 'Public Bank',
+            account_name: 'Test 3',
+            account_number: '899993',
+            type_of_account: 'Current Account3',
+        },
+
+        {
+            id: '4',
+            policyNumber: '357890',
+            bank_name: 'BPI',
+            account_name: 'Test 4',
+            account_number: '899994',
+            type_of_account: 'Current Account4',
+        },
+
+        {
+            id: '5',
+            policyNumber: '987654',
+            bank_name: 'BPI',
+            account_name: 'Test 5',
+            account_number: '899995',
+            type_of_account: 'Current Account5',
+        },
+    
 ]);
 
 export function useStaticData() {
     return {
+        bankDetails,
         bankNameOptions,
         typeOfAccountOptions,
         typeInjuryOptions,
@@ -94,5 +146,6 @@ export function useStaticData() {
         relationshipOptions,
         genderOptions,
         claimsChecklist
+        
     };
 }
