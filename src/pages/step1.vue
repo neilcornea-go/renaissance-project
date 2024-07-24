@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import GlobalLayout from "../components/structure/layout.vue";
 import StepIndicator from "../components/common/step.vue";
 import Title from "../components/common/title.vue";
@@ -21,23 +21,36 @@ import {
     getExtractedDocument
 } from "../../src/js/hooks/documentClassifierAnalysis.js";
 
-import { storage } from '../js/firebase';
+import { storage, database } from '../js/firebase';
 import { ref as fileRef, uploadString } from "firebase/storage";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+
+// Composable
+import { useStaticData } from '../composable/useStaticData';
 
 import { useDocumentsStore } from "../../src/js/stores/documents.js"
 const storeDocument = useDocumentsStore();
 
 const policyNumber = ref("");
+const errorPolicyNumber = ref("");
 const selectedFiles = ref({});
 const classified = ref(false);
 const dataExtracted = ref(false)
+const { bankDetails } = useStaticData();
 
-onMounted(() => {
-
-    jumpNext();
-});
+// Validate Policy and Generate Claims ID
+const validatePolicy = async () => {
+    const found = bankDetails.value.find(test => test.policyNumber === policyNumber.value);
+    if (!found) {
+        errorPolicyNumber.value = "The policy number does not exist in our database.";
+    } else {
+        errorPolicyNumber.value = null;
+        localStorage.setItem('claims-reference', generateClaimsID.value);
+    }
+};
 
 const getDocuments = async () => {
+    // Validate policy number
     console.log(selectedFiles.value.documents);
     const docs = selectedFiles.value.documents;
     //govt list of IDs
@@ -269,14 +282,14 @@ const moveDocuments = (data) => {
             localStorage.setItem('documents_shortlist', JSON.stringify(data))
             console.log('added documents_list in the localStorage')
 
-        var form = {
-            claim_type: data.claim_type, 
-            policy_number: policyNumber.value,
-            claim_details: {},
-            documents: [],
-            bank_details: {}
-        }
-        localStorage.setItem('form', JSON.stringify(form))
+            var form = {
+                claim_type: data.claim_type,
+                policy_number: policyNumber.value,
+                claim_details: {},
+                documents: [],
+                bank_details: {}
+            }
+            localStorage.setItem('form', JSON.stringify(form))
 
             goTo('/step-2')
 
@@ -285,26 +298,43 @@ const moveDocuments = (data) => {
     }
 }
 
+// Upload files to cloud storage
 const uploadStorage = async () => {
-    const cloudStorage = storage;
+    const db = database;
+    const claims_no = localStorage.getItem('claims-reference');
 
     console.log(selectedFiles.value);
-    
+
     if (!Array.isArray(selectedFiles.value) || selectedFiles.value.length === 0) return;
 
+    // Loop selected files
     for (const fileObj of selectedFiles.value) {
         const { base64, extension } = fileObj;
         const fileName = `docs_${Date.now()}.${extension}`;
-        const storageRef = fileRef(cloudStorage, fileName);
+        const storageRef = fileRef(storage, fileName);
 
-        try {
-            const snapshot = await uploadString(storageRef, base64, 'base64');
-            console.log(`Uploaded ${fileName}:`, snapshot);
-        } catch (error) {
-            console.error(`Error uploading ${fileName}:`, error);
-        }
+        // Upload to cloud storage
+        await uploadString(storageRef, base64, 'base64');
+
+        // Add the file info in database
+        await addDoc(collection(db, 'documents'), {
+            claims_no: claims_no,
+            document_name: fileName,
+            created_at: serverTimestamp(),
+        });
     }
 };
+
+// Claims ID Generator
+const generateClaimsID = computed(() => {
+    const prefix = "ACM";
+    const randomNumber = Math.floor(100000000 + Math.random() * 900000000);
+    return `${prefix}${randomNumber}`;
+});
+
+onMounted(() => {
+    jumpNext();
+});
 </script>
 
 <template>
@@ -321,7 +351,7 @@ const uploadStorage = async () => {
             <!-- Upload Documents -->
             <div class="flex flex-col gap-4">
                 <!-- Policy Number Input -->
-                <InputText v-model="policyNumber" label="Policy number" placeholder="e.g. 123456789B" />
+                <InputText :error="errorPolicyNumber" @change="validatePolicy" v-model="policyNumber" label="Policy number" placeholder="e.g. 123456789B" />
 
                 <Divider />
 
