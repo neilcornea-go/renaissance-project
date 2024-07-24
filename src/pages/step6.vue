@@ -51,7 +51,7 @@ import Divider from "../components/common/divider.vue";
                 </f7-card>
 
                 <div class="py-4">
-                    <f7-button fill round large class="md:w-9/12 mx-auto">DONE</f7-button>
+                    <f7-button fill large class="md:w-9/12 mx-auto">DONE</f7-button>
                 </div>
 
                 <div class="text-center pb-4">

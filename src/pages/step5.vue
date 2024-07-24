@@ -233,8 +233,8 @@ onMounted(() => {
                 </div>
 
                 <div class="py-4 space-y-3">
-                    <f7-button fill round large class="md:w-9/12 mx-auto uppercase" @click="NextPage()">Submit Claim</f7-button>
-                    <f7-button outline round large href="/step-4" class="md:w-9/12 mx-auto uppercase">Back</f7-button>
+                    <f7-button fill large class="md:w-9/12 mx-auto uppercase" @click="NextPage()">Submit Claim</f7-button>
+                    <f7-button outline large href="/step-4" class="md:w-9/12 mx-auto uppercase border-red-600">Back</f7-button>
                 </div>
             </div>
 
