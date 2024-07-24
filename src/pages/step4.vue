@@ -96,16 +96,19 @@ onMounted(() => {
             <!-- Edit Result Form -->
             <div class="flex flex-col">
                 <!-- Inputs -->
-                <InputText v-model="inputAccountName" label="Account name" placeholder="e.g. John Smith" />
+                <InputText v-model="inputAccountName" label="Account name" placeholder="e.g. John Smith" disabled/>
 
                 <InputText masked v-model="inputBankAccount" label="Bank account number"
-                    placeholder="e.g. 865301828712" />
+                    placeholder="e.g. 865301828712" disabled/>
 
-                <!-- Bank name Dropdown -->
-                <Dropdown v-model="selectedBankName" label="Bank name" :data="bankNameOptions" />
+                <!-- Bank name -->
 
-                <!-- Type of account dropdown -->
-                <Dropdown v-model="selectedTypeOfAccount" label="Type of account" :data="typeOfAccountOptions" />
+                 <InputText v-model="selectedBankName" label="Bank name" disabled/>
+                
+
+                <!-- Type of account -->
+                <InputText v-model="selectedTypeOfAccount" label="Type of account" disabled/>
+           
 
                 <!-- Action Button -->
                 <div class="bg-white my-3 space-y-4">
