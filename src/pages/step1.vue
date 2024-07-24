@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import GlobalLayout from "../components/structure/layout.vue";
 import StepIndicator from "../components/common/step.vue";
 import Title from "../components/common/title.vue";
@@ -11,6 +11,7 @@ import ChecklistPopup from "../components/main/checklist-popup.vue";
 // Form Input Components
 import InputText from "../components/common/input-text.vue";
 import InputFile from "../components/common/input-file.vue";
+import InputFile2 from "../components/common/input-file-2.vue";
 
 import { f7 } from 'framework7-vue';
 
@@ -22,6 +23,12 @@ import {
     getExtractedDocument
 } from "../../src/js/hooks/documentClassifierAnalysis.js";
 
+import { storage, database } from '../js/firebase';
+import { ref as fileRef, uploadString } from "firebase/storage";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+
+// Composable
+import { useStaticData } from '../composable/useStaticData';
 
 import { useDocumentsStore } from "../../src/js/stores/documents.js"
 const storeDocument = useDocumentsStore();
@@ -45,13 +52,25 @@ const requiredDocs = ref({
     govtIDList: [],
     accident: []
 })
+const errorPolicyNumber = ref("");
+const selectedFiles = ref({});
+const classified = ref(false);
+const dataExtracted = ref(false)
+const { bankDetails } = useStaticData();
 
-onMounted(() => {
-
-    jumpNext();
-});
+// Validate Policy and Generate Claims ID
+const validatePolicy = async () => {
+    const found = bankDetails.value.find(test => test.policyNumber === policyNumber.value);
+    if (!found) {
+        errorPolicyNumber.value = "The policy number does not exist in our database.";
+    } else {
+        errorPolicyNumber.value = null;
+        localStorage.setItem('claims-reference', generateClaimsID.value);
+    }
+};
 
 const getDocuments = async () => {
+    // Validate policy number
     console.log(selectedFiles.value.documents);
 
     const docs = selectedFiles.value.uploaded.length >= 1 ? selectedFiles.value.documents.concat(selectedFiles.value.uploaded) : selectedFiles.value.documents;
@@ -290,7 +309,7 @@ f7.views.main.router.navigate(route, {
             <!-- Upload Documents -->
             <div class="flex flex-col gap-4">
                 <!-- Policy Number Input -->
-                <InputText v-model="policyNumber" label="Policy number" placeholder="e.g. 123456789B" />
+                <InputText :error="errorPolicyNumber" @change="validatePolicy" v-model="policyNumber" label="Policy number" placeholder="e.g. 123456789B" />
 
                 <Divider />
 
@@ -316,6 +335,10 @@ f7.views.main.router.navigate(route, {
                 <!-- Click to Upload Action -->
                 <div class="space-y-2">
                     <InputFile v-model="selectedFiles" multiple @fetchDocument="documentFetch" />
+                    <InputFile v-model="selectedFiles" multiple />
+
+                    <p class="font-bold text-gray-600">Testing Upload File</p>
+                    <InputFile2 v-model="selectedFiles" multiple />
                     <span class="text-gray-500">Supported files: doc, docx, pdf, jpg (max. 5MB)</span>
                 </div>
 
@@ -401,8 +424,10 @@ f7.views.main.router.navigate(route, {
 
 
                 <div class="bg-white my-3" v-if="dataExtracted">
-                    <f7-button fill round large @click="goTo('/step-2')">Step 2</f7-button>
+                    <f7-button fill large @click="goTo('/step-2')">Step 2</f7-button>
                 </div>
+
+                <f7-button fill large @click="uploadStorage()">Upload Storage</f7-button>
 
             </div>
         </section>

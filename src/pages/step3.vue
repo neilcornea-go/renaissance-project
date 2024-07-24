@@ -17,6 +17,11 @@ import MedicalCertificateForm from '../components/form/medical-certificate-form.
 import MarriageCertificateForm from '../components/form/marriage-certificate-form.vue';
 import DeathCertificateForm from '../components/form/death-certificate-form.vue';
 
+// Firebase
+import { storage, database } from '../js/firebase';
+import { ref as fileRef, listAll, getDownloadURL } from "firebase/storage";
+import { collection, query, where, onSnapshot } from "firebase/firestore";
+
 const { claimsChecklist } = useStaticData();
 const data = ref([]);
 const identifiedClaims = ref('');
@@ -86,6 +91,45 @@ const goProceedAPI = () => {
     goToPage('/step-4')
 }
 
+// Get the File Docs in the Cloud
+const getFileList = ref([]);
+const renderCloudFiles = async () => {
+    const db = database;
+    const claims_no = localStorage.getItem('claims-reference');
+
+    const queryCollection = query(
+        collection(db, "documents"),
+        where("claims_no", "==", claims_no)
+    );
+
+    onSnapshot(queryCollection, (querySnapshot) => {
+        const newFileList = [];
+        querySnapshot.forEach((doc) => {
+            newFileList.push(doc.data().document_name);
+        });
+
+        if (JSON.stringify(newFileList) !== JSON.stringify(getFileList.value)) {
+            getFileList.value = newFileList;
+            console.log(getFileList.value);
+        }
+    });
+};
+
+// Retrieve the cloud files
+const getCloudFiles = async (filename) => {
+    const listRef = fileRef(storage, '/');
+
+    const res = await listAll(listRef);
+    const filteredItems = res.items.filter((itemRef) => {
+        return filename.includes(itemRef.name);
+    });
+
+    for (const itemRef of filteredItems) {
+        const getFileURL = await getDownloadURL(itemRef);
+        console.log('Get File URL:', getFileURL);
+    }
+};
+
 onMounted(() => {
     renderData();
 });
@@ -97,7 +141,7 @@ onMounted(() => {
             <!-- Steps Indicator -->
             <div class="space-y-2">
                 <StepIndicator step="3" />
-                <f7-progressbar color="blue" :progress="progressValue" />
+                <f7-progressbar color="#d31145" :progress="progressValue" />
                 <Title title="Verify Claim Details" />
                 <Subtitle
                     subtitle="Kindly check and verify that the details are accurate or you can click to edit the details." />

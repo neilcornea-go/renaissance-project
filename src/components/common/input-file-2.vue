@@ -12,23 +12,16 @@ const props = defineProps({
     }
 });
 
-const emits = defineEmits(['update:modelValue', 'fetchDocument']);
+const emits = defineEmits(['update:modelValue']);
 
 
 const updateValue = async (event) => {
-    const getClaimsID = localStorage.getItem('claims-reference');
     const file = event.target.files;
-
-    console.log(event);
-
-    // Check if claims id exist
-    if (!getClaimsID) {
-        alert('Enter your policy number!');
-        return;
-    }
 
     // Check if a file is selected
     if (!file) return;
+
+    console.log(file);
 
     for (let files = 0; files < file.length; files++) {
 
@@ -46,15 +39,14 @@ const updateValue = async (event) => {
             return;
         }
 
-
-
         if (files === (file.length - 1)) {
-
             var x = Array.from(file);
-            const val = await classifyDoc(x);
-            console.log(val)
-            // emits('update:modelValue', val);
-            emits('fetchDocument', val)
+            const base64Files = await Promise.all(Array.from(x).map(async (file) => {
+                const base64 = await getBase64(file);
+                const extension = file.name.split('.').pop();
+                return { base64, extension };
+            }));
+            emits('update:modelValue', base64Files);
         }
 
     }
@@ -80,11 +72,10 @@ const classifyDoc = async (value) => {
 
         } catch (error) { }
 
-        if(i === (value.length - 1)){
-            // const container = {claim_type: '', documents, classified: false, govt_id:[], filter_other_doc:[], other_doc:[], not_included:[], final_documents:[]}
+        if (i === (value.length - 1)) {
+            const container = { claim_type: '', documents, classified: false, govt_id: [], filter_other_doc: [], other_doc: [], not_included: [], final_documents: [] }
             console.log(documents, 'new file array')
-            // return container;
-            return documents
+            return container;
         }
     }
 
@@ -98,14 +89,14 @@ const getBase64 = (value) => {
             resolve(event.target.result.split(',')[1]);
         };
     })
-}
+};
 
 </script>
 
 <template>
     <div
         class="relative w-full border border-gray-400 rounded p-8 text-center bg-gray-100 hover:bg-gray-200 transition ease-in delay-75 cursor-pointer">
-        <span class="text-base font-normal text-gray-700">Click to upload</span>
+        <span class="text-base font-normal text-gray-700">Test to upload</span>
         <input @change="updateValue" type="file" class="absolute inset-0 opacity-0 cursor-pointer" multiple />
     </div>
 </template>

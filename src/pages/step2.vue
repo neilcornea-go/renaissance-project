@@ -107,6 +107,8 @@ const doneOTP = (x) => {
         lead_disablement: selectedAccidentDisablement.value
         }
 
+        console.log(claimsData)
+
         console.log(JSON.parse(localStorage.getItem('form')))
         // get the form
         var getForm = JSON.parse(localStorage.getItem('form'))
@@ -196,8 +198,8 @@ const doneOTP = (x) => {
 
             <!-- Action Button -->
             <div class="bg-white my-3 space-y-4">
-                <f7-button fill round large @click="isOpenOTP = true">Next</f7-button>
-                <f7-button outline round large @click="handleBack()">Back</f7-button>
+                <f7-button fill large @click="isOpenOTP = true">Next</f7-button>
+                <f7-button class="border-red-600" outline large @click="handleBack()">Back</f7-button>
             </div>
         </section>
     </GlobalLayout>
