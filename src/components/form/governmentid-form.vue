@@ -142,7 +142,7 @@ const nextForm = () => {
 
     <!-- Action Button -->
     <div class="space-y-4">
-        <f7-button fill round large @click="nextForm()">Next</f7-button>
-        <f7-button outline round large @click="$emit('back')">Back</f7-button>
+        <f7-button fill large @click="nextForm()">Next</f7-button>
+        <f7-button class="border-red-600" outline large @click="$emit('back')">Back</f7-button>
     </div>
 </template>
