@@ -424,17 +424,17 @@ onMounted(() => {
                 </div>
                 <!-- Action Button -->
                 <div class="bg-white my-3">
-                    <f7-button v-if="classified" fill round large @click="proceedDocuments()">Verify</f7-button>
-                    <f7-button v-else :disabled="!classified && Object.keys(selectedFiles).length === 0" fill round
+                    <f7-button v-if="classified" fill large @click="proceedDocuments()">Verify</f7-button>
+                    <f7-button v-else :disabled="!classified && Object.keys(selectedFiles).length === 0" fill
                         large @click="getDocuments()">Classify</f7-button>
                 </div>
 
 
                 <div class="bg-white my-3" v-if="dataExtracted">
-                    <f7-button fill round large @click="goTo('/step-2')">Step 2</f7-button>
+                    <f7-button fill large @click="goTo('/step-2')">Step 2</f7-button>
                 </div>
 
-                <f7-button fill round large @click="uploadStorage()">Upload Storage</f7-button>
+                <f7-button fill large @click="uploadStorage()">Upload Storage</f7-button>
 
             </div>
         </section>
