@@ -28,22 +28,46 @@ const dob = ref('');
 const sex = ref('');
 const nationality = ref('');
 const pob = ref('');
+
+const pr_dor = ref('')
+const pr_facts_of_case = ref('')
+const pr_poi = ref('')
+
+const hs_balance_due = ref('')
+const hs_confinement_no = ref('')
+const hs_date_admitted = ref('')
+const hs_date_discharge = ref('')
+const hs_time_admitted = ref('')
+const hs_time_discharge = ref('')
+const hs_soa_ref_no = ref('')
+
+
 //step4
 const account_name = ref('')
 const bank_name = ref('')
 const bank_number = ref('')
 const type_of_account = ref('')
 
+const maskedBankNumber = computed(() => {
+    if (bank_number.value.length > 4) {
+        const lastFourDigits = bank_number.value.slice(-4);
+        const maskedPart = bank_number.value.slice(0, -4).replace(/\d/g, '*');
+        return maskedPart + lastFourDigits;
+    }
+    return bank_number.value;
+});
+
+
 const goTo = (route) => {
-        f7.views.main.router.navigate(route, {
-            animate: false
-        });
+    f7.views.main.router.navigate(route, {
+        animate: false
+    });
 
 }
 
 const NextPage = () => {
 
-goTo('/step-6');
+    goTo('/step-6');
 
 }
 
@@ -65,8 +89,6 @@ onMounted(() => {
         const phPassport = step3Form.find(doc => doc.docType === 'ph-passport');
         const step4Form = formData.bank_details
 
-        //step2
-
         policy_number.value = formData.policy_number
         dateValue.value = step2Form.accident_date;
         inputValue.value = step2Form.accident_location;
@@ -74,11 +96,49 @@ onMounted(() => {
         selectedBodyInjured.value = step2Form.injured_part;
         selectedAccidentInvolve.value = step2Form.confined_accident;
 
+        const policeNarration = step3Form.find(doc => doc.docType === 'police-narration-report');
+        const hospitalStatement = step3Form.find(doc => doc.docType === 'hospital-statement');
+
+
+        // Check if the document was found
+        if (policeNarration) {
+            // console.log('Police Narration:', policeNarration);
+
+            pr_dor.value = policeNarration.pr_dor
+            pr_facts_of_case.value = policeNarration.pr_facts_of_case
+            pr_poi.value = policeNarration.pr_poi
+
+
+        } else {
+            console.log('Police Narration not found');
+        }
+
+        // Check if the document was found
+        if (hospitalStatement) {
+            console.log('Hospital Statement:', hospitalStatement);
+
+            hs_balance_due.value = hospitalStatement.hs_balance_due
+            hs_confinement_no.value = hospitalStatement.hs_confinement_no
+            hs_date_admitted.value = hospitalStatement.hs_date_admitted
+            hs_date_discharge.value = hospitalStatement.hs_date_discharge
+            hs_time_admitted.value = hospitalStatement.hs_time_admitted
+            hs_time_discharge.value = hospitalStatement.hs_time_discharge
+            hs_soa_ref_no.value = hospitalStatement.hs_soa_ref_no
+
+
+        } else {
+            console.log('Police Narration not found');
+        }
+
+        //step2
+
+
+
         //step3
 
         // Check if the document was found
         if (phPassport) {
-            console.log('PH Passport Details:', phPassport);
+            // console.log('PH Passport Details:', phPassport);
 
             idNum.value = phPassport.govt_id
             firstName.value = phPassport.fname
@@ -99,7 +159,7 @@ onMounted(() => {
         bank_number.value = step4Form.bank_number
         type_of_account.value = step4Form.type_of_account
 
-        
+
 
     }
 
@@ -138,32 +198,110 @@ onMounted(() => {
                     <h3 class="font-bold">{{ policy_number }}</h3>
                 </div>
 
-                <div class="py-2">
-                    <p>Accident Date</p>
-                    <h3 class="font-bold">{{ dateValue }}</h3>
+                <div class="flex justify-start">
+
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+                        <p>Accident Date</p>
+                        <h3 class="font-bold">{{ dateValue }}</h3>
+                    </div>
+
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+                        <p>Accident Location</p>
+                        <h3 class="font-bold">{{ inputValue }}</h3>
+                    </div>
                 </div>
 
-                <div class="py-2">
-                    <p>Accident Location</p>
-                    <h3 class="font-bold">{{ inputValue }}</h3>
+                <div class="flex justify-start">
+
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+                        <p>Injury Type</p>
+                        <h3 class="font-bold">{{ selectedInjury }}</h3>
+                    </div>
+
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+                        <p>Part of body injured</p>
+                        <h3 class="font-bold">{{ selectedBodyInjured }}</h3>
+                    </div>
                 </div>
 
-                <div class="py-2">
-                    <p>Injury Type</p>
-                    <h3 class="font-bold">{{ selectedInjury }}</h3>
-                </div>
-
-                <div class="py-2">
-                    <p>Part of body injured</p>
-                    <h3 class="font-bold">{{ selectedBodyInjured }}</h3>
-                </div>
-
-                <div class="pt-2">
+                <div class="pb-2">
                     <p>Did the accident involved confinement, surgery, or dismemberment?</p>
                     <h3 class="font-bold">{{ selectedAccidentInvolve }}</h3>
                 </div>
 
-                <Divider class="bg-black" />
+                <Divider class="border-gray-400" />
+
+                <!-- police narration -->
+
+                <div class="flex justify-start">
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+                        <p>Date of Report</p>
+                        <h3 class="font-bold">{{ pr_dor }}</h3>
+
+                    </div>
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+
+                        <p>Place of Incident</p>
+                        <h3 class="font-bold">{{ pr_poi }}</h3>
+
+                    </div>
+                </div>
+
+
+                <div class="py-2">
+                    <p>Fact of Case</p>
+                    <h3 class="font-bold">{{ pr_facts_of_case }}</h3>
+                </div>
+
+                <Divider class="border-gray-400" />
+
+                <div class="flex justify-start">
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+                        <p>SOA reference number</p>
+                        <h3 class="font-bold">{{ hs_soa_ref_no }}</h3>
+                    </div>
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+
+                        <p>Confinement number</p>
+                        <h3 class="font-bold">{{ hs_confinement_no }}</h3>
+
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+                        <p>Date Admitted</p>
+                        <h3 class="font-bold">{{ hs_date_admitted }}</h3>
+                    </div>
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+
+                        <p>Date Admitted</p>
+                        <h3 class="font-bold">{{ hs_time_admitted }}</h3>
+
+                    </div>
+                </div>
+
+                <div class="flex justify-start">
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+                        <p>Date Discharge</p>
+                        <h3 class="font-bold">{{ hs_date_discharge }}</h3>
+                    </div>
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+
+                        <p>Time Discharge</p>
+                        <h3 class="font-bold">{{ hs_time_discharge }}</h3>
+
+                    </div>
+                </div>
+
+                <div class="py-2">
+                    <p>Balance Due</p>
+                    <h3 class="font-bold">{{ hs_balance_due }}</h3>
+                </div>
+
+
+                <Divider class="border-gray-400" />
+
 
                 <div class="pb-2">
                     <p>Type of Government ID</p>
@@ -190,50 +328,58 @@ onMounted(() => {
                     <h3 class="font-bold">{{ lastname }}</h3>
                 </div>
 
-                <div class="py-2">
-                    <p>Date of birth</p>
-                    <h3 class="font-bold">{{ dob }}</h3>
+                <div class="flex justify-start">
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+                        <p>Date of birth</p>
+                        <h3 class="font-bold">{{ dob }}</h3>
+                    </div>
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+                        <p>Place of birth</p>
+                        <h3 class="font-bold">{{ pob }}</h3>
+                    </div>
                 </div>
 
-                <div class="py-2">
-                    <p>Sex</p>
-                    <h3 class="font-bold">{{ sex }}</h3>
+                <div class="flex justify-start">
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+                        <p>Sex</p>
+                        <h3 class="font-bold">{{ sex }}</h3>
+                    </div>
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+                        <p>Nationality</p>
+                        <h3 class="font-bold">{{ nationality }}</h3>
+                    </div>
                 </div>
 
-                <div class="py-2">
-                    <p>Nationality</p>
-                    <h3 class="font-bold">{{ nationality }}</h3>
+                <Divider class="border-gray-400" />
+
+                <div class="flex justify-start">
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+                        <p>Account Name</p>
+                        <h3 class="font-bold">{{ account_name }}</h3>
+                    </div>
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+
+                        <p>Type of Account</p>
+                        <h3 class="font-bold">{{ type_of_account }}</h3>
+
+                    </div>
                 </div>
 
-                <div class="pt-2">
-                    <p>Place of birth</p>
-                    <h3 class="font-bold">{{ pob }}</h3>
+                <div class="flex justify-start">
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+                        <p>Bank Name</p>
+                        <h3 class="font-bold">{{ bank_name }}</h3>
+                    </div>
+                    <div class="flex-grow py-2 justify-start items-center w-[500px]">
+                        <p>Bank Account Number</p>
+                        <h3 class="font-bold">{{ maskedBankNumber }}</h3>
+                    </div>
                 </div>
 
-                <Divider class="bg-black" />
-
-                <div class="pb-2">
-                    <p>Account Name</p>
-                    <h3 class="font-bold">{{ account_name }}</h3>
-                </div>
-
-                <div class="py-2">
-                    <p>Bank Account Number</p>
-                    <h3 class="font-bold">{{ bank_number}}</h3>
-                </div>
-
-                <div class="py-2">
-                    <p>Bank Name</p>
-                    <h3 class="font-bold">{{ bank_name }}</h3>
-                </div>
-
-                <div class="py-2">
-                    <p>Type of Account</p>
-                    <h3 class="font-bold">{{type_of_account}}</h3>
-                </div>
 
                 <div class="py-4 space-y-3">
-                    <f7-button fill round large class="md:w-9/12 mx-auto uppercase" @click="NextPage()">Submit Claim</f7-button>
+                    <f7-button fill round large class="md:w-9/12 mx-auto uppercase" @click="NextPage()">Submit
+                        Claim</f7-button>
                     <f7-button outline round large href="/step-4" class="md:w-9/12 mx-auto uppercase">Back</f7-button>
                 </div>
             </div>

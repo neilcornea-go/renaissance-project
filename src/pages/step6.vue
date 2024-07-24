@@ -1,10 +1,34 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import GlobalLayout from "../components/structure/layout.vue";
 import ArticleCard from "../components/common/articleCard.vue";
 import Title from "../components/common/title.vue";
 import Divider from "../components/common/divider.vue";
+
+const claimsNumber = ref('')
+
+
+const claimsGenerated = () => {
+
+const claimsReference = localStorage.getItem('claims-reference');
+if (claimsReference) {
+        // console.log(savedData)
+        claimsNumber.value = claimsReference;
+        console.log(claimsNumber.value)
+
+}
+
+}
+
+onMounted(() => {
+    claimsGenerated();
+});
+
 </script>
+
+
+
+
 
 <template>
     <GlobalLayout fullWidth>
@@ -34,8 +58,7 @@ import Divider from "../components/common/divider.vue";
                                     stroke-width="2" d="m9 5 7 7-7 7" />
                             </svg>
                         </a>
-                        <h3 class="text-xl font-medium">ACM000193682</h3>
-                        <h3 class="text-xl font-medium">ACM000193682</h3>
+                        <h3 class="text-xl font-medium">{{claimsNumber}}</h3>
                         <Divider />
 
                         <p class="flex mx-auto">
