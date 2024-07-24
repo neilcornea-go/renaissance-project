@@ -12,7 +12,7 @@ const props = defineProps({
     }
 });
 
-const emits = defineEmits(['update:modelValue']);
+const emits = defineEmits(['update:modelValue', 'fetchDocument']);
 
 
 const updateValue = async (event) => {
@@ -46,7 +46,8 @@ const updateValue = async (event) => {
             var x = Array.from(file);
             const val = await classifyDoc(x);
             console.log(val)
-            emits('update:modelValue', val);
+            // emits('update:modelValue', val);
+            emits('fetchDocument', val)
         }
 
     }
@@ -73,9 +74,10 @@ const classifyDoc = async (value) => {
         } catch (error) {}
 
         if(i === (value.length - 1)){
-            const container = {claim_type: '', documents, classified: false, govt_id:[], filter_other_doc:[], other_doc:[], not_included:[], final_documents:[]}
+            // const container = {claim_type: '', documents, classified: false, govt_id:[], filter_other_doc:[], other_doc:[], not_included:[], final_documents:[]}
             console.log(documents, 'new file array')
-            return container;
+            // return container;
+            return documents
         }
     }
 

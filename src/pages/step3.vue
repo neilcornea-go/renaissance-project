@@ -81,7 +81,9 @@ const goToPage = (route) => {
 };
 
 const goProceedAPI = () => {
-    alert('Go Proceed API');
+    // alert('Go Proceed API');
+
+    goToPage('/step-4')
 }
 
 onMounted(() => {

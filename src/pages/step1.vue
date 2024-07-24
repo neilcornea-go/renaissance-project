@@ -14,6 +14,8 @@ import InputFile from "../components/common/input-file.vue";
 
 import { f7 } from 'framework7-vue';
 
+import { segregateDocs, scoreDocs, filterDocs, lackingDocs } from "../../src/js/helpers/common.js";
+
 import {
     getDocumentAnalysis,
     analyzeModelDocument,
@@ -25,9 +27,24 @@ import { useDocumentsStore } from "../../src/js/stores/documents.js"
 const storeDocument = useDocumentsStore();
 
 const policyNumber = ref("");
-const selectedFiles = ref({});
+const selectedFiles = ref({
+    claim_type: '',
+    classified: false,
+    documents: [],
+    uploaded: [],
+    filter_other_doc: [],
+    final_documents: [],
+    govt_id: [],
+    not_included: [],
+    other_doc: []
+});
+const docs = ref({})
 const classified = ref(false);
 const dataExtracted = ref(false)
+const requiredDocs = ref({
+    govtIDList: [],
+    accident: []
+})
 
 onMounted(() => {
 
@@ -36,16 +53,11 @@ onMounted(() => {
 
 const getDocuments = async () => {
     console.log(selectedFiles.value.documents);
-    const docs = selectedFiles.value.documents;
+
+    const docs = selectedFiles.value.uploaded.length >= 1 ? selectedFiles.value.documents.concat(selectedFiles.value.uploaded) : selectedFiles.value.documents;
+    console.log('combined', docs);
     //govt list of IDs
     const govtID = ["ph-passport", "drivers-license"];
-    const otherDocs = [
-        "police-narration-report",
-        "hospital-statement",
-        "medical-certificate",
-        "death-certificate",
-        "marriage-certificate",
-    ];
     const accident = [
         "ph-passport",
         "drivers-license",
@@ -64,145 +76,109 @@ const getDocuments = async () => {
         "death-certificate",
         "marriage-certificate",
     ];
-    var scoring = [
-        { name: "accident", score: 0 },
-        { name: "illness", score: 0 },
-        { name: "death", score: 0 },
-    ];
+
+    var classify_doc = [];
     for (let i = 0; i < docs.length; i++) {
+
         var x = docs[i];
-        const res = await getDocumentAnalysis(x.operation_location);
-        console.log(res);
-        console.log(
-            "confidence rate: " +
-            Number(res.data.data.analyzeResult.documents[0].confidence) * 100 +
-            "%",
-            res.data.data.analyzeResult.documents[0].docType
-        );
+        if (x.document_type === '') {
+            const res = await getDocumentAnalysis(x.operation_location);
+            console.log(res);
+            console.log("confidence rate: " + Number(res.data.data.analyzeResult.documents[0].confidence) * 100 + "%", res.data.data.analyzeResult.documents[0].docType);
 
-        x.document_type = res.data.data.analyzeResult.documents[0].docType;
-        x.confidence_rate =
-            (
-                Number(res.data.data.analyzeResult.documents[0].confidence) * 100
-            ).toFixed(2) + "%";
-        x.govtid = govtID.includes(
-            res.data.data.analyzeResult.documents[0].docType
-        );
-        x.notIncluded = accident.includes(
-            res.data.data.analyzeResult.documents[0].docType
-        );
-
-        if (accident.includes(res.data.data.analyzeResult.documents[0].docType)) {
-            scoring[0].score = scoring[0].score + 1;
+            x.document_type = res.data.data.analyzeResult.documents[0].docType;
+            x.confidence_rate = (Number(res.data.data.analyzeResult.documents[0].confidence) * 100).toFixed(2) + "%";
+            x.govtid = govtID.includes(res.data.data.analyzeResult.documents[0].docType);
+            x.notIncluded = accident.includes(res.data.data.analyzeResult.documents[0].docType);
+            x.extracted_data = res.data.data.analyzeResult.documents[0]
+            classify_doc.push(x)
         }
-
-        if (illness.includes(res.data.data.analyzeResult.documents[0].docType)) {
-            scoring[1].score = scoring[1].score + 1;
+        else {
+            classify_doc.push(x)
         }
+    }
+    console.log(classify_doc, 'documents should include previous and new upload')
+    selectedFiles.value.uploaded = []
+    var classifyDoc = await segregateDocs(classify_doc) //result {govt_id_doc, other_doc}
 
-        if (death.includes(res.data.data.analyzeResult.documents[0].docType)) {
-            scoring[2].score = scoring[2].score + 1;
-        }
+    selectedFiles.value.govt_id = classifyDoc.govt_id_doc //assigned to govt id listing
+    console.log(classifyDoc, 'segregated documents should have the old and new and in different object')
+    if (classifyDoc) { //here if 2 govt ids, should not proceed
+        var scoreDocsResult = await scoreDocs(classifyDoc) //result "claim" name
 
-        if (govtID.includes(res.data.data.analyzeResult.documents[0].docType)) {
-            selectedFiles.value.govt_id.push(docs[i]);
-        }
+        if (scoreDocsResult) {
+            selectedFiles.value.claim_type = scoreDocsResult
+            console.log(scoreDocsResult)
 
-        if (otherDocs.includes(res.data.data.analyzeResult.documents[0].docType)) {
-            selectedFiles.value.other_doc.push(docs[i]);
-        }
+            var filterDocsResult = await filterDocs(classifyDoc.other_doc, scoreDocsResult) //{final_other_docs, not_included}
+            if (filterDocsResult) {
 
-        if (i === docs.length - 1) {
-            scoring.sort((a, b) => b.score - a.score);
-            const max = scoring[0].score;
-            console.log(scoring, max, scoring[0].name);
-            selectedFiles.value.claim_type = scoring[0].name;
+                selectedFiles.value.filter_other_doc = filterDocsResult.final_other_docs //assigned to final docs listing
 
-            const filter_otherDoc = selectedFiles.value.other_doc;
-            console.log(filter_otherDoc);
-            for (let y = 0; y < filter_otherDoc.length; y++) {
-                if (selectedFiles.value.claim_type === "accident") {
-                    console.log(accident.includes(filter_otherDoc[y].document_type));
-                    if (accident.includes(filter_otherDoc[y].document_type)) {
-                        selectedFiles.value.filter_other_doc.push(filter_otherDoc[y]);
-                    } else {
-                        selectedFiles.value.not_included.push(filter_otherDoc[y]);
-                    }
-                }
-                if (selectedFiles.value.claim_type === "illness") {
-                    if (illness.includes(filter_otherDoc[y].document_type)) {
-                        selectedFiles.value.filter_other_doc.push(filter_otherDoc[y]);
-                    } else {
-                        selectedFiles.value.not_included.push(filter_otherDoc[y]);
-                    }
-                }
-                if (selectedFiles.value.claim_type === "death") {
-                    if (death.includes(filter_otherDoc[y].document_type)) {
-                        selectedFiles.value.filter_other_doc.push(filter_otherDoc[y]);
-                    } else {
-                        selectedFiles.value.not_included.push(filter_otherDoc[y]);
-                    }
-                }
+                selectedFiles.value.not_included = filterDocsResult.not_included //assigned to final docs listing
+
+                console.log(filterDocsResult)
+                selectedFiles.value.classified = true;
+                classified.value = true;
+                console.log(selectedFiles.value)
+
+                var lackingDocsResult = await lackingDocs(selectedFiles.value.govt_id, selectedFiles.value.filter_other_doc, scoreDocsResult) //{govtIDList, accident}
+                console.log(lackingDocsResult)
+                requiredDocs.value = lackingDocsResult
             }
         }
     }
-    selectedFiles.value.classified = true;
-    classified.value = true;
+    return;
 
-    console.log(selectedFiles.value);
 };
 
+
 const proceedDocuments = async () => {
-    if (localStorage.getItem('use_document_store') === null) {
-        //   const govtid = selectedFiles.value.govt_id;
+    console.log(selectedFiles.value.govt_id);
 
-        console.log(selectedFiles.value.govt_id);
+    const combine_docs = selectedFiles.value.govt_id.concat(
+        selectedFiles.value.filter_other_doc
+    );
+    console.log("combine docs", combine_docs);
 
-        const combine_docs = selectedFiles.value.govt_id.concat(
-            selectedFiles.value.filter_other_doc
+    const combine_final_docs = [];
+    for (let x = 0; x < combine_docs.length; x++) {
+        const res = await analyzeModelDocument(
+            {
+                _overload: "analyzeDocument",
+                "api-version": "2024-02-29-preview",
+            },
+            {
+                base64Source: combine_docs[x].base64URL,
+            },
+            {
+                modelID: combine_docs[x].document_type,
+            }
         );
-        console.log("combine docs", combine_docs);
 
-        const combine_final_docs = [];
-        for (let x = 0; x < combine_docs.length; x++) {
-            const res = await analyzeModelDocument(
-                {
-                    _overload: "analyzeDocument",
-                    "api-version": "2024-02-29-preview",
-                },
-                {
-                    base64Source: combine_docs[x].base64URL,
-                },
-                {
-                    modelID: combine_docs[x].document_type,
-                }
-            );
-
-            if (res.ok) {
-                delete combine_docs[x].base64URL;
-                var verified_doc = {
-                    ...combine_docs[x],
-                    operation_location_verify: res.data.headers["operation-location"],
-                };
-                combine_final_docs.push(verified_doc);
-            }
-
-            if (x === combine_docs.length - 1) {
-                selectedFiles.value.final_documents = combine_final_docs;
-                console.log("verified documents", selectedFiles.value);
-
-                // storeDocument.persistDocument(selectedFiles.value)
-                console.log(storeDocument.document)
-
-                f7.dialog.confirm('Extract data now?', () => {
-                    // f7.dialog.alert('Great!');
-                    extractDocuments();
-                });
-
-
-            }
+        if (res.ok) {
+            delete combine_docs[x].base64URL;
+            var verified_doc = {
+                ...combine_docs[x],
+                operation_location_verify: res.data.headers["operation-location"],
+            };
+            combine_final_docs.push(verified_doc);
         }
 
+        if (x === combine_docs.length - 1) {
+            selectedFiles.value.final_documents = combine_final_docs;
+            console.log("verified documents", selectedFiles.value);
+
+            // storeDocument.persistDocument(selectedFiles.value)
+            console.log(storeDocument.document)
+
+            f7.dialog.confirm('Extract data now?', () => {
+                // f7.dialog.alert('Great!');
+                extractDocuments();
+            });
+
+
+        }
     }
 };
 
@@ -217,7 +193,7 @@ const extractDocuments = async () => {
             x.extracted_data = res.data
         }
 
-        if(i === (final_docs.length - 1)){            
+        if (i === (final_docs.length - 1)) {
             // localStorage.setItem('documents_full', JSON.stringify(selectedFiles.value))
             console.log('with json', selectedFiles.value)
 
@@ -225,63 +201,79 @@ const extractDocuments = async () => {
 
         }
     }
-    
-} 
-
-const jumpNext = () => {   
-
-    // // console.log(localStorage.getItem('documents_shortlist'))
-    if(localStorage.getItem('documents_shortlist') !== undefined){
-        dataExtracted.value = true
-    //     var route = '/step-2'
-    //     f7.views.main.router.navigate(route, {
-    //         animate: false
-    //     });
-    }
-}
-
-const goTo = (route) => {
-        f7.views.main.router.navigate(route, {
-            animate: false
-        });
 
 }
-
 
 const moveDocuments = (data) => {
     console.log(data)
     var documents_basic = []
     var df = data.final_documents
-    for(let i=0; i < df.length; i++){
+    for (let i = 0; i < df.length; i++) {
         // console.log(df[i].extracted_data.data.analyzeResult)
         var d = df[i].extracted_data.data.analyzeResult.documents[0]
         var x = {
-            docType: d.docType, 
+            docType: d.docType,
             confidence: d.confidence,
-            fields: d.fields}
-        documents_basic.push(x)
-    if(i === (df.length - 1)){
-        var data = {claim_type: data.claim_type, documents: documents_basic}
-        localStorage.setItem('documents_shortlist', JSON.stringify(data))
-        console.log('added documents_list in the localStorage')
-
-        var form = {
-            claim_type: data.claim_type, 
-            policy_number: policyNumber.value,
-            claim_details: {},
-            documents: [],
-            bank_details: {}
+            fields: d.fields
         }
-        localStorage.setItem('form', JSON.stringify(form))
+        documents_basic.push(x)
+        if (i === (df.length - 1)) {
+            var data = { claim_type: data.claim_type, documents: documents_basic }
+            localStorage.setItem('documents_shortlist', JSON.stringify(data))
+            console.log('added documents_list in the localStorage')
 
-        goTo('/step-2')
+            var form = {
+                claim_type: data.claim_type,
+                policy_number: policyNumber.value,
+                claim_details: {},
+                documents: [],
+                bank_details: {}
+            }
+            localStorage.setItem('form', JSON.stringify(form))
+
+            goTo('/step-2')
 
 
-    }
+        }
     }
 
 
 }
+
+const documentFetch = (data) => {
+    // selectedFiles.value.documents = selectedFiles.value.documents.concat(data)
+    if (selectedFiles.value.classified) {
+        data.forEach((e) => {
+            selectedFiles.value.uploaded.push(e)
+            console.log(selectedFiles.value)
+        })
+    }
+    else {
+        data.forEach((e) => {
+            selectedFiles.value.documents.push(e)
+        })
+        // selectedFiles.value.documents.push(data)
+        console.log(data)
+        console.log(selectedFiles.value)
+
+    }
+}
+
+
+
+const jumpNext = () => {
+if (localStorage.getItem('documents_shortlist') !== undefined) {
+    dataExtracted.value = true
+}
+}
+
+const goTo = (route) => {
+f7.views.main.router.navigate(route, {
+    animate: false
+});
+
+}
+
 </script>
 
 <template>
@@ -320,20 +312,50 @@ const moveDocuments = (data) => {
                 <!-- Checklist Popup -->
                 <ChecklistPopup />
 
+
                 <!-- Click to Upload Action -->
                 <div class="space-y-2">
-                    <InputFile v-model="selectedFiles" multiple />
+                    <InputFile v-model="selectedFiles" multiple @fetchDocument="documentFetch" />
                     <span class="text-gray-500">Supported files: doc, docx, pdf, jpg (max. 5MB)</span>
                 </div>
 
+                <div v-if="requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length > 0">
+                    <span class="text-gray-500 font-semibold text-xs uppercase">Required Documents</span>
+                    <div :class="'bg-gray-100 hover:bg-gray-200'"
+                        class="flex justify-between flex-wrap items-center p-4 my-2 rounded transition ease-in">
+                        <div class="flex flex-row justify-center gap-2 align-items-center">
+                            <div class="flex flex-direction-column">
+
+                                <div v-if="requiredDocs.govtIDList.length === 2">
+                                    <span class="text-gray-400 font-semibold text-xs uppercase">Atleast 1 government
+                                        ID</span>
+                                    <span class="text-gray-400 text-xs uppercase"
+                                        v-for="gov in requiredDocs.govtIDList">- {{ gov.replace(/-/g, ' ') }}</span>
+                                </div>
+
+                                <span class="text-gray-400 font-semibold text-xs uppercase"
+                                    v-if="requiredDocs.accident.length !== 0">Additional</span>
+                                <span class="text-gray-400 text-xs uppercase" v-for="other in requiredDocs.accident">-
+                                    {{ other.replace(/-/g, ' ') }}</span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
                 <!-- Documents List -->
+                <div v-if="selectedFiles.classified && selectedFiles.uploaded.length >= 1">
+                    <span class="text-gray-500 font-semibold text-xs uppercase">Unprocessed File</span>
+                    <DocumentInfo type="normal" :files="selectedFiles.uploaded" />
+                    <!-- {{selectedFiles[0].name}} -->
+                </div>
                 <!-- government id -->
                 <div v-if="!selectedFiles.classified">
                     <DocumentInfo type="normal" :files="selectedFiles.documents" />
                     <!-- {{selectedFiles[0].name}} -->
                 </div>
                 <div v-else>
-                    <span class="text-gray-500 font-semibold text-xs uppercase">Government ID</span>
+                    <span class="text-gray-500 font-semibold text-xs uppercase"
+                        v-if="selectedFiles.govt_id.length != 0">Government ID</span>
 
                     <DocumentInfo v-if="selectedFiles.govt_id.length <= 1" type="normal"
                         :files="selectedFiles.govt_id" />
@@ -356,7 +378,7 @@ const moveDocuments = (data) => {
                 </div>
 
                 <!-- Error Prompt -->
-                <div class="bg-gray-100 px-4 py-8 rounded" v-if="classified">
+                <div class="bg-gray-100 px-4 py-8 rounded" v-if="classified && selectedFiles.not_included.length !== 0">
                     <p class="text-red-500 text-base mb-4">
                         It appears that you are filing a claim for an
                         {{ selectedFiles.claim_type }}. The document(s) below will be
@@ -368,12 +390,16 @@ const moveDocuments = (data) => {
                 </div>
                 <!-- Action Button -->
                 <div class="bg-white my-3">
-                    <f7-button v-if="classified" fill round large @click="proceedDocuments()">Verify</f7-button>
+                    <f7-button v-if="classified && selectedFiles.uploaded.length == 0" fill round large
+                        @click="proceedDocuments()">Verify</f7-button>
+                    <f7-button v-else-if="classified && selectedFiles.uploaded.length >= 1" fill round large
+                        @click="getDocuments()">Classify</f7-button>
+
                     <f7-button v-else :disabled="!classified && Object.keys(selectedFiles).length === 0" fill round
                         large @click="getDocuments()">Classify</f7-button>
                 </div>
 
-                
+
                 <div class="bg-white my-3" v-if="dataExtracted">
                     <f7-button fill round large @click="goTo('/step-2')">Step 2</f7-button>
                 </div>
