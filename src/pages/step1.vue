@@ -46,14 +46,11 @@ const selectedFiles = ref({
     other_doc: []
 });
 const docs = ref({})
-const classified = ref(false);
-const dataExtracted = ref(false)
 const requiredDocs = ref({
     govtIDList: [],
     accident: []
 })
 const errorPolicyNumber = ref("");
-const selectedFiles = ref({});
 const classified = ref(false);
 const dataExtracted = ref(false)
 const { bankDetails } = useStaticData();
@@ -223,6 +220,19 @@ const extractDocuments = async () => {
 
 }
 
+const jumpNext = () => {
+if (localStorage.getItem('documents_shortlist') !== undefined) {
+    dataExtracted.value = true
+}
+}
+
+const goTo = (route) => {
+f7.views.main.router.navigate(route, {
+    animate: false
+});
+
+}
+
 const moveDocuments = (data) => {
     console.log(data)
     var documents_basic = []
@@ -278,20 +288,43 @@ const documentFetch = (data) => {
     }
 }
 
+// Upload files to cloud storage
+const uploadStorage = async () => {
+    const db = database;
+    const claims_no = localStorage.getItem('claims-reference');
 
+    console.log(selectedFiles.value);
 
-const jumpNext = () => {
-if (localStorage.getItem('documents_shortlist') !== undefined) {
-    dataExtracted.value = true
-}
-}
+    if (!Array.isArray(selectedFiles.value) || selectedFiles.value.length === 0) return;
 
-const goTo = (route) => {
-f7.views.main.router.navigate(route, {
-    animate: false
+    // Loop selected files
+    for (const fileObj of selectedFiles.value) {
+        const { base64, extension } = fileObj;
+        const fileName = `docs_${Date.now()}.${extension}`;
+        const storageRef = fileRef(storage, fileName);
+
+        // Upload to cloud storage
+        await uploadString(storageRef, base64, 'base64');
+
+        // Add the file info in database
+        await addDoc(collection(db, 'documents'), {
+            claims_no: claims_no,
+            document_name: fileName,
+            created_at: serverTimestamp(),
+        });
+    }
+};
+
+// Claims ID Generator
+const generateClaimsID = computed(() => {
+    const prefix = "ACM";
+    const randomNumber = Math.floor(100000000 + Math.random() * 900000000);
+    return `${prefix}${randomNumber}`;
 });
 
-}
+onMounted(() => {
+    jumpNext();
+});
 
 </script>
 
@@ -335,7 +368,6 @@ f7.views.main.router.navigate(route, {
                 <!-- Click to Upload Action -->
                 <div class="space-y-2">
                     <InputFile v-model="selectedFiles" multiple @fetchDocument="documentFetch" />
-                    <InputFile v-model="selectedFiles" multiple />
 
                     <p class="font-bold text-gray-600">Testing Upload File</p>
                     <InputFile2 v-model="selectedFiles" multiple />

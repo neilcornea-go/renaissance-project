@@ -98,7 +98,7 @@ const claimsChecklist = ref([
         },
         {
             id: '2',
-            policyNumber: '0987654321',
+            policyNumber: '1234567890',
             bank_name: 'BPI',
             account_name: 'Hector Neil',
             account_number: '2345678901',
