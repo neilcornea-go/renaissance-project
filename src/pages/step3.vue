@@ -141,7 +141,8 @@ onMounted(() => {
             <!-- Steps Indicator -->
             <div class="space-y-2">
                 <StepIndicator step="3" />
-                <f7-progressbar color="#d31145" :progress="progressValue" />
+                <!-- <f7-progressbar color="#d31145" :progress="progressValue" /> -->
+                <f7-progressbar color="#d31145" :progress="60" />
                 <Title title="Verify Claim Details" />
                 <Subtitle
                     subtitle="Kindly check and verify that the details are accurate or you can click to edit the details." />
@@ -154,10 +155,3 @@ onMounted(() => {
         </section>
     </GlobalLayout>
 </template>
-
-<style scoped>
-.progressbar {
-    height: 7px;
-    border-radius: 10px;
-}
-</style>

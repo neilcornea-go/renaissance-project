@@ -52,7 +52,8 @@ const requiredDocs = ref({
 })
 const errorPolicyNumber = ref("");
 const classified = ref(false);
-const dataExtracted = ref(false)
+const dataExtracted = ref(false);
+const isPreload = ref(false);
 const { bankDetails } = useStaticData();
 
 // Validate Policy and Generate Claims ID
@@ -73,7 +74,7 @@ const validatePolicy = async () => {
 const getDocuments = async () => {
     // Validate policy number
     console.log(selectedFiles.value.documents);
-
+    isPreload.value = true;
     const docs = selectedFiles.value.uploaded.length >= 1 ? selectedFiles.value.documents.concat(selectedFiles.value.uploaded) : selectedFiles.value.documents;
 
     console.log('combined', docs);
@@ -149,6 +150,7 @@ const getDocuments = async () => {
             }
         }
     }
+    isPreload.value = false;
     return;
 
 };
@@ -156,6 +158,7 @@ const getDocuments = async () => {
 
 const proceedDocuments = async () => {
 
+    isPreload.value = true;
     var checkDocsGovtResult = await checkDocs(selectedFiles.value.govt_id)
 
     if(checkDocsGovtResult){
@@ -170,9 +173,11 @@ const proceedDocuments = async () => {
         f7.dialog.confirm('Extract data now?', () => {
             // f7.dialog.alert('Great!');
             contentCheck();
+            isPreload.value = false;
         });
         }
     }
+    
 };
 
 const contentCheck = async () => {
@@ -290,6 +295,8 @@ const moveDocuments = (data) => {
 
             goTo('/step-2')
 
+            uploadStorage()
+
 
         }
     }
@@ -321,18 +328,19 @@ const uploadStorage = async () => {
     const db = database;
     const claims_no = localStorage.getItem('claims-reference');
 
-    console.log(selectedFiles.value);
+    console.log(selectedFiles.value.final_documents);
 
-    if (!Array.isArray(selectedFiles.value) || selectedFiles.value.length === 0) return;
+    if (!Array.isArray(selectedFiles.value.final_documents) || selectedFiles.value.final_documents.length === 0) return;
 
     // Loop selected files
-    for (const fileObj of selectedFiles.value) {
-        const { base64, extension } = fileObj;
+    for (const fileObj of selectedFiles.value.final_documents) {
+        const { base64URL } = fileObj;
+        var extension = fileObj.file.name.split('.').pop();
         const fileName = `docs_${Date.now()}.${extension}`;
         const storageRef = fileRef(storage, fileName);
 
         // Upload to cloud storage
-        await uploadString(storageRef, base64, 'base64');
+        await uploadString(storageRef, base64URL, 'base64');
 
         // Add the file info in database
         await addDoc(collection(db, 'documents'), {
@@ -360,8 +368,9 @@ onMounted(() => {
     <GlobalLayout>
         <section class="flex flex-col gap-8">
             <!-- Steps Indicator -->
-            <div class="space-y-1">
+            <div class="space-y-2">
                 <StepIndicator step="1" />
+                <f7-progressbar color="#d31145" :progress="20" />
                 <Title title="Submit a Claim" />
                 <Subtitle
                     subtitle="Let us know about your claim by entering your policy number and uploading all the required documents." />
@@ -397,8 +406,9 @@ onMounted(() => {
                 <div class="space-y-2">
                     <InputFile v-model="selectedFiles" multiple @fetchDocument="documentFetch" />
 
-                    <p class="font-bold text-gray-600">Testing Upload File</p>
-                    <InputFile2 v-model="selectedFiles" multiple />
+                    <!-- <p class="font-bold text-gray-600">Testing Upload File</p>
+                    <InputFile2 v-model="selectedFiles" multiple /> -->
+
                     <span class="text-gray-500">Supported files: doc, docx, pdf, jpg (max. 5MB)</span>
                 </div>
 
@@ -481,25 +491,25 @@ onMounted(() => {
                 <!-- Action Button -->                
                 <div class="bg-white my-3">
 
-                    <f7-button v-if="selectedFiles.claim_type !== '' && selectedFiles.classified && (requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length >= 1)" fill round
-                        large @click="getDocuments()" :disabled="selectedFiles.uploaded.length === 0 || (requiredDocs.govtIDList.length === 1 && requiredDocs.accident.length === 0)">Classify</f7-button>
+                    <f7-button preloader :loading="isPreload" v-if="selectedFiles.claim_type !== '' && selectedFiles.classified && (requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length >= 1)" fill
+                        large @click="getDocuments()" :disabled="selectedFiles.uploaded.length === 0 || (requiredDocs.govtIDList.length === 1 && requiredDocs.accident.length === 0) || isPreload">Classify</f7-button>
 
-                    <f7-button v-else-if="selectedFiles.claim_type !== '' && selectedFiles.classified" fill round large
-                        @click="proceedDocuments()">Verify</f7-button>
+                    <f7-button preloader :loading="isPreload" v-else-if="selectedFiles.claim_type !== '' && selectedFiles.classified" fill large
+                        @click="proceedDocuments()" :disabled="isPreload">Verify</f7-button>
 
-                    <f7-button v-else-if="selectedFiles.claim_type === '' && !selectedFiles.classified" fill round
-                        large @click="getDocuments()">Classify</f7-button>
+                    <f7-button preloader :loading="isPreload" v-else-if="selectedFiles.claim_type === '' && !selectedFiles.classified" fill
+                        large @click="getDocuments()" :disabled="isPreload">Classify</f7-button>
 
-                    <f7-button v-else :disabled="!classified" fill round
+                    <f7-button preloader :loading="isPreload" v-else :disabled="!classified || isPreload" fill
                         large @click="getDocuments()">Classify</f7-button>
                 </div>
 
 
-                <div class="bg-white my-3" v-if="dataExtracted">
+                <!-- <div class="bg-white my-3" v-if="dataExtracted">
                     <f7-button fill large @click="goTo('/step-2')">Step 2</f7-button>
-                </div>
+                </div> -->
 
-                <f7-button fill large @click="uploadStorage()">Upload Storage</f7-button>
+                <!-- <f7-button fill large @click="uploadStorage()">Upload Storage</f7-button> -->
 
             </div>
         </section>
