@@ -78,7 +78,7 @@ onMounted(() => {
                 </div>
 
                 <div class="text-center pb-4">
-                    <f7-link class="" href="http://google.com" external target="_blank">
+                    <f7-link class="" href="/step-1" external>
                         <h2 class="uppercase text-base underline text-blue-700 font-light">
                             Submit a new claim
                         </h2>

@@ -22,8 +22,8 @@ const props = defineProps({
     </f7-card-content>
 </f7-card> -->
 
-    <f7-card class="relative bg-cover bg-top mx-0 rounded-b-none z-0 group h-98" :style="`background-image: url(${url})`">
-        <div class="absolute inset-0 bg-black opacity-30 rounded-t-2xl"></div>
+    <f7-card class="relative bg-cover bg-top mx-0 z-0 group h-98" :style="`background-image: url(${url})`">
+        <div class="absolute inset-0 bg-black opacity-30 rounded-t-2xl rounded-b-2xl"></div>
         <f7-card-content class="relative pt-36">
             <p>{{ props.category }}</p>
 
