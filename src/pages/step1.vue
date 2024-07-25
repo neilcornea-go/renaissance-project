@@ -52,7 +52,8 @@ const requiredDocs = ref({
 })
 const errorPolicyNumber = ref("");
 const classified = ref(false);
-const dataExtracted = ref(false)
+const dataExtracted = ref(false);
+const isPreload = ref(false);
 const { bankDetails } = useStaticData();
 
 // Validate Policy and Generate Claims ID
@@ -69,7 +70,7 @@ const validatePolicy = async () => {
 const getDocuments = async () => {
     // Validate policy number
     console.log(selectedFiles.value.documents);
-
+    isPreload.value = true;
     const docs = selectedFiles.value.uploaded.length >= 1 ? selectedFiles.value.documents.concat(selectedFiles.value.uploaded) : selectedFiles.value.documents;
     console.log('combined', docs);
     //govt list of IDs
@@ -144,6 +145,7 @@ const getDocuments = async () => {
             }
         }
     }
+    isPreload.value = false;
     return;
 
 };
@@ -152,6 +154,7 @@ const getDocuments = async () => {
 const proceedDocuments = async () => {
     console.log(selectedFiles.value.govt_id);
 
+    isPreload.value = true;
     const combine_docs = selectedFiles.value.govt_id.concat(
         selectedFiles.value.filter_other_doc
     );
@@ -196,6 +199,7 @@ const proceedDocuments = async () => {
 
         }
     }
+    isPreload.value = false;
 };
 
 const extractDocuments = async () => {
@@ -445,12 +449,12 @@ onMounted(() => {
                 </div>
                 <!-- Action Button -->
                 <div class="bg-white my-3">
-                    <f7-button v-if="classified && selectedFiles.uploaded.length == 0" fill round large
+                    <f7-button preloader :loading="isPreload" :disabled="isPreload" v-if="classified && selectedFiles.uploaded.length == 0" fill large
                         @click="proceedDocuments()">Verify</f7-button>
-                    <f7-button v-else-if="classified && selectedFiles.uploaded.length >= 1" fill round large
+                    <f7-button preloader :loading="isPreload" :disabled="isPreload" v-else-if="classified && selectedFiles.uploaded.length >= 1" fill large
                         @click="getDocuments()">Classify</f7-button>
 
-                    <f7-button v-else :disabled="!classified && Object.keys(selectedFiles).length === 0" fill round
+                    <f7-button preloader :loading="isPreload" v-else :disabled="!classified && Object.keys(selectedFiles).length === 0 || isPreload" fill
                         large @click="getDocuments()">Classify</f7-button>
                 </div>
 
