@@ -12,6 +12,11 @@
     --f7-touch-ripple-color: transparent;
 }
 
+.progressbar {
+    height: 7px;
+    border-radius: 10px;
+}
+
 input[type='date'],
 input[type='time'],
 input[type='text'],
