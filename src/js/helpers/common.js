@@ -1,3 +1,9 @@
+
+import {
+    analyzeModelDocument,
+    getExtractedDocument
+} from "../../js/hooks/documentClassifierAnalysis.js";
+
   export const segregateDocs = async (docs) => {   
         
     const govtID = ["ph-passport", "drivers-license"];
@@ -172,7 +178,81 @@
     
     var result = {govtIDList, accident}
     return result
+  }
 
+  export const checkDocs = async (docs) => {
 
+    console.log(docs);
+
+    const docs_location_verify = [];
+    for (let x = 0; x < docs.length; x++) {
+        const res = await analyzeModelDocument(
+            {
+                _overload: "analyzeDocument",
+                "api-version": "2024-02-29-preview",
+            },
+            {
+                base64Source: docs[x].base64URL,
+            },
+            {
+                modelID: docs[x].document_type,
+            }
+        );
+
+        if (res.ok) {
+            // delete docs[x].base64URL;
+            var verified_doc = {
+                ...docs[x],
+                operation_location_verify: res.data.headers["operation-location"],
+            };
+            docs_location_verify.push(verified_doc);
+        }
+    }
+    return docs_location_verify;
 
   }
+
+  
+  export const contentCheckDocs = async (docs) => {
+
+    const docs_extracted = [];
+    for (let i = 0; i < docs.length; i++) {
+        var x = docs[i];
+        const res = await getExtractedDocument(x.operation_location_verify);
+        console.log(res);
+        if (res.ok) {
+            var extracted = res.data.data.analyzeResult.documents[0].fields
+            if(x.document_type === 'ph-passport') var fullname = extracted.fname.content+' '+ extracted.lname.content
+            if(x.document_type === 'hospital-statement') var fullname = extracted.hs_fname.content+' '+ extracted.hs_lname.content
+            if(x.document_type === 'police-narration-report') var fullname = extracted.pr_fname.content+' '+ extracted.pr_lname.content
+
+            var claimant = JSON.parse(localStorage.getItem("claimant"));
+            if(fullname.toLowerCase() !== claimant.account_name.toLowerCase()){ var error = true; var errorMsg = 'Document information is not for policy holder.'}
+            else{ var error = false; var errorMsg = ''}
+            x.extracted_data = res.data
+            docs_extracted.push({...docs[i], extracted_data: res.data, error, errorMsg})
+        }
+    }
+    return docs_extracted;
+
+  }
+
+    
+  export const checkErrorDocs = async (docs) => {
+
+    var safe_docs = docs.filter(obj => obj.error === false)
+    var error_docs = docs.filter(obj => obj.error === true)
+    
+    return {safe_docs, error_docs};
+
+  }
+  export const removeDocuments = async (docs, documents) => { 
+    for(let i=0; i < docs.length; i++){
+        var er = documents
+        var x = er.filter(obj => obj.file.name !== docs[i].file.name)
+        er = x
+    }
+    return er
+  }
+  
+  

@@ -74,7 +74,7 @@ const classifyDoc = async (value) => {
                 'base64Source': docBase64
             });
             console.log(res, 'classifying doc', res.data.headers['operation-location']);
-            var newFile = { file: value[i], base64URL: docBase64, operation_location: res.data.headers['operation-location'], document_type: '', confidence_rate: '', govtid: false, notIncluded: false, extracted_data: {} }
+            var newFile = { file: value[i], base64URL: docBase64, operation_location: res.data.headers['operation-location'], document_type: '', confidence_rate: '', govtid: false, notIncluded: false, extracted_data: {}, error: false, errorMsg: '' }
             documents.push(newFile)
             console.log(newFile)
 

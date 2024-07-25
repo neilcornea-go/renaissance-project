@@ -15,12 +15,11 @@ import InputFile2 from "../components/common/input-file-2.vue";
 
 import { f7 } from 'framework7-vue';
 
-import { segregateDocs, scoreDocs, filterDocs, lackingDocs } from "../../src/js/helpers/common.js";
+//Helpers
+import { segregateDocs, scoreDocs, filterDocs, lackingDocs, checkDocs, contentCheckDocs, checkErrorDocs, removeDocuments } from "../../src/js/helpers/common.js";
 
 import {
     getDocumentAnalysis,
-    analyzeModelDocument,
-    getExtractedDocument
 } from "../../src/js/hooks/documentClassifierAnalysis.js";
 
 import { storage, database } from '../js/firebase';
@@ -43,9 +42,10 @@ const selectedFiles = ref({
     final_documents: [],
     govt_id: [],
     not_included: [],
-    other_doc: []
+    other_doc: [],
+    error_files: [],
+    verified: false
 });
-const docs = ref({})
 const requiredDocs = ref({
     govtIDList: [],
     accident: []
@@ -63,6 +63,10 @@ const validatePolicy = async () => {
     } else {
         errorPolicyNumber.value = null;
         localStorage.setItem('claims-reference', generateClaimsID.value);
+
+        var policyUser = bankDetails.value.filter(obj => obj.policyNumber === policyNumber.value)
+        localStorage.removeItem("claimant");
+        localStorage.setItem('claimant', JSON.stringify(policyUser[0]));
     }
 };
 
@@ -71,6 +75,7 @@ const getDocuments = async () => {
     console.log(selectedFiles.value.documents);
 
     const docs = selectedFiles.value.uploaded.length >= 1 ? selectedFiles.value.documents.concat(selectedFiles.value.uploaded) : selectedFiles.value.documents;
+
     console.log('combined', docs);
     //govt list of IDs
     const govtID = ["ph-passport", "drivers-license"];
@@ -150,74 +155,97 @@ const getDocuments = async () => {
 
 
 const proceedDocuments = async () => {
-    console.log(selectedFiles.value.govt_id);
 
-    const combine_docs = selectedFiles.value.govt_id.concat(
-        selectedFiles.value.filter_other_doc
-    );
-    console.log("combine docs", combine_docs);
+    var checkDocsGovtResult = await checkDocs(selectedFiles.value.govt_id)
 
-    const combine_final_docs = [];
-    for (let x = 0; x < combine_docs.length; x++) {
-        const res = await analyzeModelDocument(
-            {
-                _overload: "analyzeDocument",
-                "api-version": "2024-02-29-preview",
-            },
-            {
-                base64Source: combine_docs[x].base64URL,
-            },
-            {
-                modelID: combine_docs[x].document_type,
-            }
-        );
+    if(checkDocsGovtResult){
+        selectedFiles.value.govt_id = checkDocsGovtResult
+        console.log(selectedFiles.value.govt_id)
 
-        if (res.ok) {
-            delete combine_docs[x].base64URL;
-            var verified_doc = {
-                ...combine_docs[x],
-                operation_location_verify: res.data.headers["operation-location"],
-            };
-            combine_final_docs.push(verified_doc);
-        }
-
-        if (x === combine_docs.length - 1) {
-            selectedFiles.value.final_documents = combine_final_docs;
-            console.log("verified documents", selectedFiles.value);
-
-            // storeDocument.persistDocument(selectedFiles.value)
-            console.log(storeDocument.document)
-
-            f7.dialog.confirm('Extract data now?', () => {
-                // f7.dialog.alert('Great!');
-                extractDocuments();
-            });
-
-
+        var checkDocsOtherResult = await checkDocs(selectedFiles.value.filter_other_doc)
+        if(checkDocsOtherResult){
+        selectedFiles.value.filter_other_doc = checkDocsOtherResult
+        console.log(selectedFiles.value.filter_other_doc)
+        
+        f7.dialog.confirm('Extract data now?', () => {
+            // f7.dialog.alert('Great!');
+            contentCheck();
+        });
         }
     }
 };
 
-const extractDocuments = async () => {
+const contentCheck = async () => {
+    
+    console.log(selectedFiles.value.govt_id)
+    
+    var checkDocsGovtResult = await contentCheckDocs(selectedFiles.value.govt_id)
+    if(checkDocsGovtResult){
+        console.log(checkDocsGovtResult)
+        selectedFiles.value.govt_id = checkDocsGovtResult
 
-    var final_docs = selectedFiles.value.final_documents
-    for (let i = 0; i < final_docs.length; i++) {
-        var x = final_docs[i];
-        const res = await getExtractedDocument(x.operation_location_verify);
-        console.log(res);
-        if (res.ok) {
-            x.extracted_data = res.data
-        }
+        var checkDocsOthersResult = await contentCheckDocs(selectedFiles.value.filter_other_doc)
+        if(checkDocsOthersResult){
+            console.log(checkDocsOthersResult)
+            selectedFiles.value.filter_other_doc = checkDocsOthersResult
 
-        if (i === (final_docs.length - 1)) {
-            // localStorage.setItem('documents_full', JSON.stringify(selectedFiles.value))
-            console.log('with json', selectedFiles.value)
-
-            moveDocuments(selectedFiles.value);
+            filterErrorDocs()
 
         }
     }
+}
 
+const filterErrorDocs = async () => {
+
+    const res = await checkErrorDocs(selectedFiles.value.govt_id)
+    if(res){
+        console.log(res)
+        if(res.error_docs.length === 0){selectedFiles.value.govt_id = res.safe_docs}
+        else {
+            selectedFiles.value.govt_id = res.safe_docs; 
+            var combine = selectedFiles.value.error_files.concat(res.error_docs)
+            selectedFiles.value.error_files = combine
+        }           
+
+    }
+    const resOther = await checkErrorDocs(selectedFiles.value.filter_other_doc)
+    if(resOther){
+    console.log(resOther)
+        if(resOther.error_docs.length === 0){selectedFiles.value.filter_other_doc = resOther.safe_docs}
+        else {
+            selectedFiles.value.filter_other_doc = resOther.safe_docs; 
+            var combine = selectedFiles.value.error_files.concat(resOther.error_docs)
+            selectedFiles.value.error_files = combine
+        }
+    }
+    
+    console.log(selectedFiles.value)
+    selectedFiles.value.verified = true
+
+    var rem = await removeDocsinDocuments()
+
+    var lackingDocsResult = await lackingDocs(selectedFiles.value.govt_id, selectedFiles.value.filter_other_doc, selectedFiles.value.claim_type) //{govtIDList, accident}
+    console.log(lackingDocsResult)
+    requiredDocs.value = lackingDocsResult
+
+    if(lackingDocsResult.accident.length === 0 && lackingDocsResult.govtIDList.length === 1){
+        var combine_final_docs = selectedFiles.value.govt_id.concat(selectedFiles.value.filter_other_doc)
+        selectedFiles.value.final_documents = combine_final_docs
+        moveDocuments(selectedFiles.value);
+    }
+
+}
+
+const removeDocsinDocuments = async() => {
+
+    var remove_error = await removeDocuments(selectedFiles.value.error_files, selectedFiles.value.documents);
+    if(remove_error){
+        var remove_not_inc = await removeDocuments(selectedFiles.value.not_included, remove_error);
+        if(remove_not_inc){
+            console.log(remove_not_inc)
+            selectedFiles.value.documents = remove_not_inc
+        }
+    }
 }
 
 const jumpNext = () => {
@@ -401,12 +429,10 @@ onMounted(() => {
                 <div v-if="selectedFiles.classified && selectedFiles.uploaded.length >= 1">
                     <span class="text-gray-500 font-semibold text-xs uppercase">Unprocessed File</span>
                     <DocumentInfo type="normal" :files="selectedFiles.uploaded" />
-                    <!-- {{selectedFiles[0].name}} -->
                 </div>
                 <!-- government id -->
                 <div v-if="!selectedFiles.classified">
                     <DocumentInfo type="normal" :files="selectedFiles.documents" />
-                    <!-- {{selectedFiles[0].name}} -->
                 </div>
                 <div v-else>
                     <span class="text-gray-500 font-semibold text-xs uppercase"
@@ -428,8 +454,17 @@ onMounted(() => {
                     <span class="text-gray-500 font-semibold text-xs uppercase">Other Files</span>
                     <DocumentInfo type="normal" :files="selectedFiles.filter_other_doc" />
 
-                    <!-- <DocumentInfo type="normal" :files="selectedFiles" document_type="otherid"/> -->
-                    <!-- {{selectedFiles[0].name}} -->
+                </div>
+
+                <!-- Error Prompt -->
+                <div class="bg-gray-100 px-4 py-8 rounded" v-if="classified && selectedFiles.error_files.length !== 0">
+                    <p class="text-red-500 text-base mb-4">
+                        It appears that these documents contains information that is not related to the policy holder. The document(s) below will be
+                        removed as they are not required.
+                    </p>
+
+                    <!-- Error Documents List -->
+                    <DocumentInfo type="error" :delete_icon="false" :files="selectedFiles.error_files" />
                 </div>
 
                 <!-- Error Prompt -->
@@ -443,14 +478,19 @@ onMounted(() => {
                     <!-- Error Documents List -->
                     <DocumentInfo type="error" :delete_icon="false" :files="selectedFiles.not_included" />
                 </div>
-                <!-- Action Button -->
+                <!-- Action Button -->                
                 <div class="bg-white my-3">
-                    <f7-button v-if="classified && selectedFiles.uploaded.length == 0" fill round large
-                        @click="proceedDocuments()">Verify</f7-button>
-                    <f7-button v-else-if="classified && selectedFiles.uploaded.length >= 1" fill round large
-                        @click="getDocuments()">Classify</f7-button>
 
-                    <f7-button v-else :disabled="!classified && Object.keys(selectedFiles).length === 0" fill round
+                    <f7-button v-if="selectedFiles.claim_type !== '' && selectedFiles.classified && (requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length >= 1)" fill round
+                        large @click="getDocuments()" :disabled="selectedFiles.uploaded.length === 0 || (requiredDocs.govtIDList.length === 1 && requiredDocs.accident.length === 0)">Classify</f7-button>
+
+                    <f7-button v-else-if="selectedFiles.claim_type !== '' && selectedFiles.classified" fill round large
+                        @click="proceedDocuments()">Verify</f7-button>
+
+                    <f7-button v-else-if="selectedFiles.claim_type === '' && !selectedFiles.classified" fill round
+                        large @click="getDocuments()">Classify</f7-button>
+
+                    <f7-button v-else :disabled="!classified" fill round
                         large @click="getDocuments()">Classify</f7-button>
                 </div>
 
