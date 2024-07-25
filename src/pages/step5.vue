@@ -48,6 +48,8 @@ const bank_name = ref('')
 const bank_number = ref('')
 const type_of_account = ref('')
 
+const isPreload = ref(false);
+
 const maskedBankNumber = computed(() => {
     if (bank_number.value.length > 4) {
         const lastFourDigits = bank_number.value.slice(-4);
@@ -62,17 +64,26 @@ const goTo = (route) => {
     f7.views.main.router.navigate(route, {
         animate: false
     });
-
 }
 
 const NextPage = () => {
+    isPreload.value = true;
+    setTimeout(() => {
+        isPreload.value = false;
+        if (!isPreload.value) {
+            const toast = f7.toast.create({
+                text: `Successfully submitted claims`,
+                closeButton: true,
+                closeButtonText: 'Okay',
+                closeButtonColor: 'green',
+                closeTimeout: 3000,
+            });
+            toast.open();
 
-    goTo('/step-6');
-
-}
-
-
-
+            goTo('/step-6');
+        }
+    }, 2000);
+};
 
 onMounted(() => {
     const savedData = localStorage.getItem('form');
@@ -379,7 +390,8 @@ onMounted(() => {
 
 
                 <div class="py-4 space-y-3">
-                    <f7-button fill large class=" " @click="NextPage()">Submit
+                    <f7-button fill large preloader :loading="isPreload" :disabled="isPreload"
+                        @click="NextPage()">Submit
                         Claim</f7-button>
                     <f7-button outline large href="/step-4" class=" border-red-600">Back</f7-button>
                 </div>

@@ -1,4 +1,5 @@
 <script setup>
+import { f7 } from 'framework7-vue';
 import { ref, onMounted } from "vue";
 import GlobalLayout from "../components/structure/layout.vue";
 import ArticleCard from "../components/common/articleCard.vue";
@@ -6,19 +7,30 @@ import Title from "../components/common/title.vue";
 import Divider from "../components/common/divider.vue";
 
 const claimsNumber = ref('')
-
+const isPreload = ref(false);
 
 const claimsGenerated = () => {
-
-const claimsReference = localStorage.getItem('claims-reference');
-if (claimsReference) {
+    const claimsReference = localStorage.getItem('claims-reference');
+    if (claimsReference) {
         // console.log(savedData)
         claimsNumber.value = claimsReference;
         console.log(claimsNumber.value)
-
+    }
 }
 
-}
+const goTo = (route) => {
+    f7.views.main.router.navigate(route, {
+        animate: false
+    });
+};
+
+const NextPage = () => {
+    isPreload.value = true;
+    setTimeout(() => {
+        isPreload.value = false;
+        goTo('/');
+    }, 1000);
+};
 
 onMounted(() => {
     claimsGenerated();
@@ -51,14 +63,14 @@ onMounted(() => {
                     <f7-card-content>
                         <a href="#" class="flex justify-between">
                             <p>Claim reference number(s)</p>
-                            <svg class="w-6 h-6 text-gray-800 dark:text-white opacity-0 absolute right-5 transition-opacity duration-300 group-hover:opacity-100" aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
+                            <svg class="w-6 h-6 text-gray-800 dark:text-white opacity-0 absolute right-5 transition-opacity duration-300 group-hover:opacity-100"
+                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                                 viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="2" d="m9 5 7 7-7 7" />
                             </svg>
                         </a>
-                        <h3 class="text-xl font-medium">{{claimsNumber}}</h3>
+                        <h3 class="text-xl font-medium">{{ claimsNumber }}</h3>
                         <Divider />
 
                         <p class="flex mx-auto">
@@ -74,11 +86,11 @@ onMounted(() => {
                 </f7-card>
 
                 <div class="py-4">
-                    <f7-button fill large class="md:w-9/12 mx-auto">DONE</f7-button>
+                    <f7-button @click="NextPage()" preloader :loading="isPreload" :disabled="isPreload" fill large class="md:w-9/12 mx-auto">DONE</f7-button>
                 </div>
 
                 <div class="text-center pb-4">
-                    <f7-link class="" href="/step-1" external>
+                    <f7-link class="" href="/" external>
                         <h2 class="uppercase text-base underline text-blue-700 font-light">
                             Submit a new claim
                         </h2>

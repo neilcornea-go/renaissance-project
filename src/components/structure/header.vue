@@ -21,7 +21,7 @@ onMounted(() => {
     <header class="bg-[#d31145]">
         <nav class="max-w-screen-lg mx-auto py-6 px-6">
             <div class="flex items-center gap-4">
-                <svg @click="backButton" v-show="currentPath !== '/step-1' && currentPath !== '/step-6'" class="w-[36px] h-[36px] text-white cursor-pointer" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                <svg @click="backButton" v-show="currentPath !== '/step-1' && currentPath !== '/' && currentPath !== '/step-6'" class="w-[36px] h-[36px] text-white cursor-pointer" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                     width="24" height="24" fill="none" viewBox="0 0 24 24">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                         d="M5 12h14M5 12l4-4m-4 4 4 4" />
