@@ -128,8 +128,9 @@ const doneOTP = (x) => {
     <GlobalLayout>
         <section class="flex flex-col gap-8">
             <!-- Steps Indicator -->
-            <div class="space-y-1">
+            <div class="space-y-2">
                 <StepIndicator step="2" />
+                <f7-progressbar color="#d31145" :progress="40" />
                 <Title title="Verify Claim Details" />
                 <Subtitle
                     subtitle="Kindly check and verify that the details are accurate or you can click to edit the details." />

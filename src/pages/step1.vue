@@ -336,8 +336,9 @@ onMounted(() => {
     <GlobalLayout>
         <section class="flex flex-col gap-8">
             <!-- Steps Indicator -->
-            <div class="space-y-1">
+            <div class="space-y-2">
                 <StepIndicator step="1" />
+                <f7-progressbar color="#d31145" :progress="20" />
                 <Title title="Submit a Claim" />
                 <Subtitle
                     subtitle="Let us know about your claim by entering your policy number and uploading all the required documents." />

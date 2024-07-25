@@ -82,8 +82,9 @@ onMounted(() => {
     <GlobalLayout>
         <section class="flex flex-col gap-8">
             <!-- Steps Indicator -->
-            <div class="space-y-1">
+            <div class="space-y-2">
                 <StepIndicator step="4" />
+                <f7-progressbar color="#d31145" :progress="80" />
                 <Title title="Your Bank Details" />
                 <Subtitle
                     subtitle="Kindly check your bank account details are accurate or you can click to edit the details" />

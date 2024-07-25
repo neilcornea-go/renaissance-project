@@ -171,8 +171,9 @@ onMounted(() => {
     <GlobalLayout fullWidth>
         <section class="flex flex-col gap-8 py-6 px-6 max-w-screen-lg mx-auto">
             <!-- Steps Indicator -->
-            <div class="space-y-1">
+            <div class="space-y-2">
                 <StepIndicator step="5" />
+                <f7-progressbar color="#d31145" :progress="100" />
                 <Title title="Review Summary" />
                 <Subtitle subtitle="Please review summary before proceeding" />
             </div>
