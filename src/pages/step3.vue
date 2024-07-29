@@ -36,7 +36,7 @@ const formComponents = {
 
 const renderData = () => {
     try {
-        const getResponse = localStorage.getItem('documents_shortlist');
+        const getResponse = localStorage.getItem('form');
         const parseResponse = JSON.parse(getResponse);
         data.value = parseResponse;
         identifiedClaims.value = data.value.claim_type;

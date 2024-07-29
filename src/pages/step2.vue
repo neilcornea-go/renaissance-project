@@ -30,6 +30,7 @@ const selectedAccidentDisablement = ref('Yes');
 const selectedNatureDeath = ref('Illness');
 const selectedRelationship = ref('Spouse');
 const data = ref({})
+const form = ref({})
 
 onMounted(() => {
     renderData();
@@ -40,7 +41,11 @@ const renderData = async () => {
     try {
         const getResponse = await localStorage.getItem('documents_shortlist');
         data.value = JSON.parse(getResponse);
+
+        const getResponseForm = await localStorage.getItem('form');
+        form.value = JSON.parse(getResponseForm);
         console.log(data.value)
+        console.log(form.value)
         passValues();
     }
     catch (error) {
@@ -66,12 +71,11 @@ const passValues = async() => {
             return x
         }
     }))[0]
-
     
     // var edit = y.substring(0, y.length-1)
     console.log(y.pr_dor)
-    accidentDate.value = formatDate(y.pr_dor)
-    accidentPOI.value = y.pr_poi
+    accidentDate.value = form.value.claim_details.accident_date || formatDate(y.pr_dor)
+    accidentPOI.value = form.value.claim_details.accident_location || y.pr_poi
     }
 }
 
@@ -112,6 +116,13 @@ const doneOTP = (x) => {
         console.log(JSON.parse(localStorage.getItem('form')))
         // get the form
         var getForm = JSON.parse(localStorage.getItem('form'))
+
+            //get document shortlist
+            var getDocumentShortlist = JSON.parse(localStorage.getItem('documents_shortlist'))
+            
+            //get the documents in document shortlist
+            getForm.documents = getDocumentShortlist.documents
+
         // add a content in the claim details in form
         getForm.claim_details = {...claimsData}
         // remove first what is in localstorage
