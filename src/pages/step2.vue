@@ -90,6 +90,10 @@ const formatDate = (dateString) => {
 
 const handleBack = () => {
     goTo('/step-1');
+    localStorage.removeItem('claimant');
+    localStorage.removeItem('claims-reference');
+    localStorage.removeItem('documents_shortlist');
+    localStorage.removeItem('form');
 }
 
 const goTo = (route) => {
@@ -158,7 +162,7 @@ const transformDocumentsObject = (documents) => {
 
 const nextForm = () => {
     isOpenOTP.value = true;
-    
+
     var claimsData = {
         claim_type: data.value.claim_type,
         accident_date: accidentDate.value,
