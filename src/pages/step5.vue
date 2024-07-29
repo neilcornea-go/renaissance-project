@@ -9,6 +9,10 @@ import Subtitle from '../components/common/subtitle.vue';
 import Divider from "../components/common/divider.vue";
 import { f7 } from 'framework7-vue';
 
+// Firebase
+import { database } from '../js/firebase';
+import { collection, where, getDocs, addDoc, query, serverTimestamp } from "firebase/firestore";
+
 // Data Hook for Accident Section
 //step1
 const policy_number = ref('');
@@ -78,12 +82,40 @@ const NextPage = () => {
                 closeButtonColor: 'green',
                 closeTimeout: 3000,
             });
+            submitClaims();
+
             toast.open();
+
+            localStorage.removeItem('claimant');
+            localStorage.removeItem('claims-reference');
+            localStorage.removeItem('documents_shortlist');
+            localStorage.removeItem('form');
 
             goTo('/step-6');
         }
     }, 2000);
 };
+
+const submitClaims = async () => {
+    const getForm = JSON.parse(localStorage.getItem('form'));
+    const getClaimsNo = localStorage.getItem('claims-reference');
+    const db = database;
+    const collectionRef = collection(db, 'submission');
+    const querySnapshot = await getDocs(query(collectionRef, where('claims_no', '==', getClaimsNo)));
+
+    if (querySnapshot.empty) {
+        await addDoc(collectionRef, {
+            claims_no: getClaimsNo,
+            data: getForm,
+            created_at: serverTimestamp(),
+        });
+    }
+
+    // save the claims_no in cookies with 5 minutes duration
+    const now = new Date();
+    const expirationTime = new Date(now.getTime() + 5 * 60 * 1000).toUTCString();
+    document.cookie = `claims_no=${getClaimsNo}; expires=${expirationTime}; path=/`;
+}
 
 onMounted(() => {
     const savedData = localStorage.getItem('form');
@@ -169,9 +201,6 @@ onMounted(() => {
         bank_name.value = step4Form.bank_name
         bank_number.value = step4Form.bank_number
         type_of_account.value = step4Form.type_of_account
-
-
-
     }
 
 })
@@ -196,7 +225,7 @@ onMounted(() => {
                 <div class="space-y-2 flex justify-between items-center text-center">
                     <Title title="Claims Details" class="!text-xl" />
 
-                    <a href="/step-2">
+                    <a @click="goTo('/step-2')">
                         <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -393,7 +422,7 @@ onMounted(() => {
                     <f7-button fill large preloader :loading="isPreload" :disabled="isPreload"
                         @click="NextPage()">Submit
                         Claim</f7-button>
-                    <f7-button outline large href="/step-4" class=" border-red-600">Back</f7-button>
+                    <f7-button outline large @click="goTo('/step-4')" class=" border-red-600">Back</f7-button>
                 </div>
             </div>
 

@@ -23,7 +23,6 @@ const props = defineProps({
     data: Object
 });
 
-
 // Form Data
 const FormData = ref({
     docType: formType,
@@ -43,26 +42,27 @@ const extractData = () => {
     }
     const matchingDoc = props.data.documents.find(doc => doc.docType === formType);
 
-    if (matchingDoc && matchingDoc.fields) {
+    if (matchingDoc) {
         const updatedData = {
             docType: matchingDoc.docType || null,
             docName: identifyGovType(matchingDoc.docType),
-            govt_id: matchingDoc.fields.govt_id?.content || 'N/A',
-            fname: toSentenceCase(matchingDoc.fields.fname?.content) || 'N/A',
-            mname: toSentenceCase(matchingDoc.fields.mname?.content) || 'N/A',
-            lname: toSentenceCase(matchingDoc.fields.lname?.content) || 'N/A',
-            dob: formatDate(matchingDoc.fields.dob?.content) || 'N/A',
-            sex: matchingDoc.fields.sex?.content === 'M' ? 'Male' :
-                matchingDoc.fields.sex?.content === 'F' ? 'Female' : 'N/A',
-            nationality: toSentenceCase(matchingDoc.fields.nationality?.content) || 'N/A',
-            pob: toSentenceCase(matchingDoc.fields.pob?.content) || 'N/A',
+            govt_id: matchingDoc.govt_id || 'N/A',
+            fname: toSentenceCase(matchingDoc.fname) || 'N/A',
+            mname: toSentenceCase(matchingDoc.mname) || 'N/A',
+            lname: toSentenceCase(matchingDoc.lname) || 'N/A',
+            dob: formatDate(matchingDoc.dob) || 'N/A',
+            sex: updateSex(matchingDoc.sex),
+            nationality: toSentenceCase(matchingDoc.nationality) || 'N/A',
+            pob: toSentenceCase(matchingDoc.pob) || 'N/A',
         };
 
         FormData.value = { ...FormData.value, ...updatedData };
-
-        console.log(FormData.value)
     }
 };
+
+const updateSex = (sex) => {
+    return sex === 'M' ? 'Male' : sex === 'F' ? 'Female' : sex;
+}
 
 const identifyGovType = (id) => {
     switch (id) {
@@ -104,22 +104,24 @@ onMounted(() => {
     extractData();
 });
 
-const nextForm = () => {    
+const nextForm = () => {
     emit('next')
 
-    console.log(JSON.parse(localStorage.getItem('form')))
-        // get the form
-        var getForm = JSON.parse(localStorage.getItem('form'))
-        // remove first what is in localstorage
-        localStorage.removeItem('form');  
-        // filter the documents to remove prior saved
-        getForm.documents = getForm.documents.filter(function( obj ) {return obj.docType !== formType;})
-        // add a content in the claim details in form
-        getForm.documents.push(FormData.value)      
-        //then set again the new form
-        localStorage.setItem('form', JSON.stringify(getForm))
-        console.log(getForm)
-    
+    var getForm = JSON.parse(localStorage.getItem('form'))
+    localStorage.removeItem('form');
+    getForm.documents = getForm.documents.filter(function (obj) { return obj.docType !== formType; })
+    getForm.documents.push(FormData.value)
+    localStorage.setItem('form', JSON.stringify(getForm))
+}
+
+const backForm = () => {
+    emit('back')
+
+    var getForm = JSON.parse(localStorage.getItem('form'))
+    localStorage.removeItem('form');
+    getForm.documents = getForm.documents.filter(function (obj) { return obj.docType !== formType; })
+    getForm.documents.push(FormData.value)
+    localStorage.setItem('form', JSON.stringify(getForm))
 }
 
 </script>
@@ -143,6 +145,6 @@ const nextForm = () => {
     <!-- Action Button -->
     <div class="space-y-4">
         <f7-button fill large @click="nextForm()">Next</f7-button>
-        <f7-button class="border-red-600" outline large @click="$emit('back')">Back</f7-button>
+        <f7-button class="border-red-600" outline large @click="backForm()">Back</f7-button>
     </div>
 </template>

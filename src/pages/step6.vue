@@ -10,12 +10,8 @@ const claimsNumber = ref('')
 const isPreload = ref(false);
 
 const claimsGenerated = () => {
-    const claimsReference = localStorage.getItem('claims-reference');
-    if (claimsReference) {
-        // console.log(savedData)
-        claimsNumber.value = claimsReference;
-        console.log(claimsNumber.value)
-    }
+    const claimsReference = getCookieValue('claims_no');
+    claimsNumber.value = claimsReference;
 }
 
 const goTo = (route) => {
@@ -41,9 +37,26 @@ const newClaim = () => {
 }
 
 onMounted(() => {
-    claimsGenerated();
+    setTimeout(() => {
+        claimsGenerated();
+    }, 1000);
 });
 
+const getCookieValue = (cookieName) => {
+    const name = cookieName + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const cookieArray = decodedCookie.split(';');
+    for (let i = 0; i < cookieArray.length; i++) {
+        let cookie = cookieArray[i];
+        while (cookie.charAt(0) == ' ') {
+            cookie = cookie.substring(1);
+        }
+        if (cookie.indexOf(name) == 0) {
+            return cookie.substring(name.length, cookie.length);
+        }
+    }
+    return "";
+}
 </script>
 
 
@@ -78,7 +91,7 @@ onMounted(() => {
                                     stroke-width="2" d="m9 5 7 7-7 7" />
                             </svg>
                         </a>
-                        <h3 class="text-xl font-medium">{{ claimsNumber }}</h3>
+                        <h3 class="text-xl font-medium">{{ claimsNumber ? claimsNumber : 'Loading...' }}</h3>
                         <Divider />
 
                         <p class="flex mx-auto">

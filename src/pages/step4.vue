@@ -114,7 +114,7 @@ onMounted(() => {
                 <!-- Action Button -->
                 <div class="bg-white my-3 space-y-4">
                     <f7-button fill large @click="NextPage()">Next</f7-button>
-                    <f7-button class="border-red-600" outline large>Back</f7-button>
+                    <f7-button class="border-red-600" outline large @click="goTo('/step-3')">Back</f7-button>
                 </div>
             </div>
         </section>

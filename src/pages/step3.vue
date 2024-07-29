@@ -38,6 +38,7 @@ const renderData = () => {
     try {
         const getResponse = localStorage.getItem('form');
         const parseResponse = JSON.parse(getResponse);
+
         data.value = parseResponse;
         identifiedClaims.value = data.value.claim_type;
     } catch (error) {
@@ -65,16 +66,20 @@ const progressValue = computed(() => {
 const handleBack = () => {
     if (currentFormIndex.value === 0) {
         goToPage('/step-2');
+        renderData();
     } else {
         currentFormIndex.value--;
+        renderData();
     }
 }
 
 const handleNext = () => {
     if (currentFormIndex.value < totalSteps - 1) {
         currentFormIndex.value++;
+        renderData();
     } else if (currentFormIndex.value === totalSteps - 1) {
         goProceedAPI();
+        renderData();
     }
 }
 

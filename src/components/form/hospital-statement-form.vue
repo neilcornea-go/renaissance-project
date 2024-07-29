@@ -31,15 +31,15 @@ const extractData = () => {
     }
     const matchingDoc = props.data.documents.find(doc => doc.docType === formType);
 
-    if (matchingDoc && matchingDoc.fields) {
+    if (matchingDoc) {
         const updatedData = {
-            hs_soa_ref_no: matchingDoc.fields.hs_soa_ref_no?.content || null,
-            hs_confinement_no: matchingDoc.fields.hs_confinement_no?.content || 'N/A',
-            hs_date_admitted: formatDate(matchingDoc.fields.hs_date_admitted?.content) || null,
-            hs_time_admitted: formatTime(matchingDoc.fields.hs_time_admitted?.content) || null,
-            hs_date_discharge: formatDate(matchingDoc.fields.hs_date_discharge?.content) || null,
-            hs_time_discharge: formatTime(matchingDoc.fields.hs_time_discharge?.content) || null,
-            hs_balance_due: matchingDoc.fields.hs_balance_due?.content || null,
+            hs_soa_ref_no: matchingDoc.hs_soa_ref_no || null,
+            hs_confinement_no: matchingDoc.hs_confinement_no || 'N/A',
+            hs_date_admitted: formatDate(matchingDoc.hs_date_admitted) || null,
+            hs_time_admitted: formatTime(matchingDoc.hs_time_admitted) || null,
+            hs_date_discharge: formatDate(matchingDoc.hs_date_discharge) || null,
+            hs_time_discharge: formatTime(matchingDoc.hs_time_discharge) || null,
+            hs_balance_due: matchingDoc.hs_balance_due || null,
         };
 
         FormData.value = { ...FormData.value, ...updatedData };
@@ -74,22 +74,24 @@ onMounted(() => {
     extractData();
 });
 
-const nextForm = () => {    
+const nextForm = () => {
     emit('next')
 
-    console.log(JSON.parse(localStorage.getItem('form')))
-        // get the form
-        var getForm = JSON.parse(localStorage.getItem('form'))
-        // remove first what is in localstorage
-        localStorage.removeItem('form'); 
-        // filter the documents to remove prior saved
-        getForm.documents = getForm.documents.filter(function( obj ) {return obj.docType !== formType;})
-        // add a content in the claim details in form
-        getForm.documents.push(FormData.value)       
-        //then set again the new form
-        localStorage.setItem('form', JSON.stringify(getForm))
-        console.log(getForm)
-    
+    var getForm = JSON.parse(localStorage.getItem('form'))
+    localStorage.removeItem('form');
+    getForm.documents = getForm.documents.filter(function (obj) { return obj.docType !== formType; })
+    getForm.documents.push(FormData.value)
+    localStorage.setItem('form', JSON.stringify(getForm))
+}
+
+const backForm = () => {
+    emit('back')
+
+    var getForm = JSON.parse(localStorage.getItem('form'))
+    localStorage.removeItem('form');
+    getForm.documents = getForm.documents.filter(function (obj) { return obj.docType !== formType; })
+    getForm.documents.push(FormData.value)
+    localStorage.setItem('form', JSON.stringify(getForm))
 }
 
 </script>
@@ -114,6 +116,6 @@ const nextForm = () => {
     <!-- Action Button -->
     <div class="space-y-4">
         <f7-button fill large @click="nextForm()">Next</f7-button>
-        <f7-button class="border-red-600" outline large @click="$emit('back')">Back</f7-button>
+        <f7-button class="border-red-600" outline large @click="backForm()">Back</f7-button>
     </div>
 </template>

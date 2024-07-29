@@ -44,8 +44,8 @@ const renderData = async () => {
 
         const getResponseForm = await localStorage.getItem('form');
         form.value = JSON.parse(getResponseForm);
-        console.log(data.value)
-        console.log(form.value)
+        // console.log(data.value)
+        // console.log(form.value)
         passValues();
     }
     catch (error) {
@@ -53,29 +53,29 @@ const renderData = async () => {
     }
 }
 
-const passValues = async() => {
-    if(data.value.claim_type === 'accident'){
+const passValues = async () => {
+    if (data.value.claim_type === 'accident') {
         console.log('accident')
         // accidentDate.value = documents[1].fields.pr_dor.content;
 
-    const x = await data.value.documents.map(e => {
-        if(e.docType === 'police-narration-report'){
-            return {pr_dor: e.fields.pr_dor.content, pr_poi: e.fields.pr_poi.content};
-        }
-        else return ''
-    })
+        const x = await data.value.documents.map(e => {
+            if (e.docType === 'police-narration-report') {
+                return { pr_dor: e.fields.pr_dor.content, pr_poi: e.fields.pr_poi.content };
+            }
+            else return ''
+        })
 
 
-    var y =  (x.filter(function (item){
-        if(item !== ''){
-            return x
-        }
-    }))[0]
-    
-    // var edit = y.substring(0, y.length-1)
-    console.log(y.pr_dor)
-    accidentDate.value = form.value.claim_details.accident_date || formatDate(y.pr_dor)
-    accidentPOI.value = form.value.claim_details.accident_location || y.pr_poi
+        var y = (x.filter(function (item) {
+            if (item !== '') {
+                return x
+            }
+        }))[0]
+
+        // var edit = y.substring(0, y.length-1)
+        console.log(y.pr_dor)
+        accidentDate.value = form.value.claim_details.accident_date || formatDate(y.pr_dor)
+        accidentPOI.value = form.value.claim_details.accident_location || y.pr_poi
     }
 }
 
@@ -89,19 +89,77 @@ const formatDate = (dateString) => {
 };
 
 const handleBack = () => {
-        goTo('/step-1');
+    goTo('/step-1');
 }
 
 const goTo = (route) => {
-        f7.views.main.router.navigate(route, {
-            animate: false
-        });
+    f7.views.main.router.navigate(route, {
+        animate: false
+    });
 
 }
 
 const doneOTP = (x) => {
-    if(x){
+    if (x) {
         var claimsData = {
+            claim_type: data.value.claim_type,
+            accident_date: accidentDate.value,
+            accident_location: accidentPOI.value,
+            injury_type: selectedInjury.value,
+            injured_part: selectedBodyInjured.value,
+            confined_accident: selectedAccidentInvolve.value,
+            lead_disablement: selectedAccidentDisablement.value
+        }
+
+        // console.log(claimsData)
+
+        // console.log(JSON.parse(localStorage.getItem('form')))
+        // // get the form
+        // var getForm = JSON.parse(localStorage.getItem('form'))
+
+        // //get document shortlist
+        // var getDocumentShortlist = JSON.parse(localStorage.getItem('documents_shortlist'))
+
+        // //get the documents in document shortlist
+        // getForm.documents = getDocumentShortlist.documents
+
+        // // add a content in the claim details in form
+        // getForm.claim_details = { ...claimsData }
+        // // remove first what is in localstorage
+        // localStorage.removeItem('form');
+        // //then set again the new form
+        // localStorage.setItem('form', JSON.stringify(getForm))
+        // console.log('ls', getForm)
+
+        const getDocumentShortlist = JSON.parse(localStorage.getItem('documents_shortlist'));
+        const getForm = JSON.parse(localStorage.getItem('form'));
+        if (!getForm.documents.length) {
+            getForm.documents = transformDocumentsObject(getDocumentShortlist.documents);
+            getForm.claim_details = { ...claimsData };
+            localStorage.removeItem('form');
+            localStorage.setItem('form', JSON.stringify(getForm));
+            console.log('ls', getForm);
+        }
+
+        console.log('test', getForm.documents);
+    }
+}
+
+// To clean up the data structures for the Form fields
+const transformDocumentsObject = (documents) => {
+    return documents.map(doc => {
+        let transformedDoc = { docType: doc.docType, confidence: doc.confidence };
+        for (let field in doc.fields) {
+            transformedDoc[field] = doc.fields[field].valueString;
+        }
+        return transformedDoc;
+    });
+};
+
+const nextForm = () => {
+    isOpenOTP.value = true;
+    
+    var claimsData = {
         claim_type: data.value.claim_type,
         accident_date: accidentDate.value,
         accident_location: accidentPOI.value,
@@ -109,28 +167,12 @@ const doneOTP = (x) => {
         injured_part: selectedBodyInjured.value,
         confined_accident: selectedAccidentInvolve.value,
         lead_disablement: selectedAccidentDisablement.value
-        }
-
-        console.log(claimsData)
-
-        console.log(JSON.parse(localStorage.getItem('form')))
-        // get the form
-        var getForm = JSON.parse(localStorage.getItem('form'))
-
-            //get document shortlist
-            var getDocumentShortlist = JSON.parse(localStorage.getItem('documents_shortlist'))
-            
-            //get the documents in document shortlist
-            getForm.documents = getDocumentShortlist.documents
-
-        // add a content in the claim details in form
-        getForm.claim_details = {...claimsData}
-        // remove first what is in localstorage
-        localStorage.removeItem('form');        
-        //then set again the new form
-        localStorage.setItem('form', JSON.stringify(getForm))
-        console.log(getForm)
     }
+
+    // Update the Form
+    const getForm = JSON.parse(localStorage.getItem('form'));
+    getForm.claim_details = { ...getForm.claim_details, ...claimsData };
+    localStorage.setItem('form', JSON.stringify(getForm));
 }
 
 </script>
@@ -210,7 +252,7 @@ const doneOTP = (x) => {
 
             <!-- Action Button -->
             <div class="bg-white my-3 space-y-4">
-                <f7-button fill large @click="isOpenOTP = true">Next</f7-button>
+                <f7-button fill large @click="nextForm()">Next</f7-button>
                 <f7-button class="border-red-600" outline large @click="handleBack()">Back</f7-button>
             </div>
         </section>
@@ -218,7 +260,6 @@ const doneOTP = (x) => {
 </template>
 
 <style scoped>
-
 .otp-popup {
     height: 100%;
     width: 100%;

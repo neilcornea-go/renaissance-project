@@ -25,9 +25,9 @@ const extractData = () => {
         return;
     }
     const matchingDoc = props.data.documents.find(doc => doc.docType === formType);
-    FormData.value.pr_facts_of_case = matchingDoc.fields.pr_facts_of_case.content;
-    FormData.value.pr_dor = formatDate(matchingDoc.fields.pr_dor.content);
-    FormData.value.pr_poi = matchingDoc.fields.pr_poi.content;
+    FormData.value.pr_facts_of_case = matchingDoc.pr_facts_of_case;
+    FormData.value.pr_dor = formatDate(matchingDoc.pr_dor);
+    FormData.value.pr_poi = matchingDoc.pr_poi;
 };
 
 const formatDate = (dateString) => {
@@ -43,22 +43,24 @@ onMounted(() => {
     extractData();
 });
 
-const nextForm = () => {    
+const nextForm = () => {
     emit('next')
 
-    console.log(JSON.parse(localStorage.getItem('form')))
-        // get the form
-        var getForm = JSON.parse(localStorage.getItem('form'))
-        // remove first what is in localstorage
-        localStorage.removeItem('form'); 
-        // filter the documents to remove prior saved
-        getForm.documents = getForm.documents.filter(function( obj ) {return obj.docType !== formType;})
-        // add a content in the claim details in form
-        getForm.documents.push(FormData.value)       
-        //then set again the new form
-        localStorage.setItem('form', JSON.stringify(getForm))
-        console.log(getForm)
-    
+    var getForm = JSON.parse(localStorage.getItem('form'))
+    localStorage.removeItem('form');
+    getForm.documents = getForm.documents.filter(function (obj) { return obj.docType !== formType; })
+    getForm.documents.push(FormData.value)
+    localStorage.setItem('form', JSON.stringify(getForm))
+}
+
+const backForm = () => {
+    emit('back')
+
+    var getForm = JSON.parse(localStorage.getItem('form'))
+    localStorage.removeItem('form');
+    getForm.documents = getForm.documents.filter(function (obj) { return obj.docType !== formType; })
+    getForm.documents.push(FormData.value)
+    localStorage.setItem('form', JSON.stringify(getForm))
 }
 </script>
 
@@ -74,6 +76,6 @@ const nextForm = () => {
     <!-- Action Button -->
     <div class="space-y-4">
         <f7-button fill large @click="nextForm()">Next</f7-button>
-        <f7-button class="border-red-600" outline large @click="$emit('back')">Back</f7-button>
+        <f7-button class="border-red-600" outline large @click="backForm()">Back</f7-button>
     </div>
 </template>
