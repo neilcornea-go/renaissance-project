@@ -400,8 +400,10 @@ onMounted(() => {
                                     stroke-width="1.5"
                                     d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
-                            <span class="cursor-pointer hover:underline popup-open" :class="!policyNumberFound ? 'text-gray-300' : 'text-gray-600'" data-popup=".checklist-popup">View
+                            
+                            <span v-if="policyNumberFound" class="cursor-pointer hover:underline popup-open text-gray-600" data-popup=".checklist-popup">View
                                 document checklist</span>
+                            <span v-else class="text-gray-300">View document checklist</span>
                         </p>
                     </div>
 
