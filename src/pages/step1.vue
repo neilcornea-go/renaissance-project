@@ -419,8 +419,8 @@ onMounted(() => {
                         <span class="text-gray-500">Supported files: doc, docx, pdf, jpg (max. 5MB)</span>
                     </div>
 
-                    <!-- <div v-if="requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length > 0"> -->
-                        <div v-if="true">
+                    <div v-if="requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length > 0">
+                        <!-- <div v-if="true"> -->
                         <span class="text-gray-500 font-semibold text-xs uppercase">Required Documents</span>
                         <div :class="'bg-red-100 hover:bg-gray-200'"
                             class="flex justify-between flex-wrap items-center p-4 my-2 rounded transition ease-in">
