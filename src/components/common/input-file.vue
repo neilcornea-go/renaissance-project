@@ -9,6 +9,10 @@ const props = defineProps({
     multiple: {
         type: Boolean,
         default: false
+    },
+    canUpload: {
+        type: Boolean,
+        default: true
     }
 });
 
@@ -105,7 +109,7 @@ const getBase64 = (value) => {
 <template>
     <div
         class="relative w-full border border-gray-400 rounded p-8 text-center bg-gray-100 hover:bg-gray-200 transition ease-in delay-75 cursor-pointer">
-        <span class="text-base font-normal text-gray-700">Click to upload</span>
-        <input @change="updateValue" type="file" class="absolute inset-0 opacity-0 cursor-pointer" multiple />
+        <span class="text-base font-normal" :class="canUpload ? 'text-gray-300' : ' text-gray-700'">Click to upload</span>
+        <input :disabled="canUpload" @change="updateValue" type="file" class="absolute inset-0 opacity-0 cursor-pointer" multiple />
     </div>
 </template>

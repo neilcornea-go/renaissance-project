@@ -386,21 +386,21 @@ onMounted(() => {
                     label="Policy number" placeholder="e.g. 123456789B" />
 
                 <!-- Will show when policy number is found -->
-                <div class="flex flex-col gap-4" v-if="policyNumberFound">
+                <div class="flex flex-col gap-4" v-if="true">
 
                     <Divider />
 
                     <!-- Title Header -->
                     <div class="space-y-2">
-                        <h2 class="text-gray-700 text-lg font-medium">Upload documents</h2>
-                        <p class="flex items-center gap-1 text-blue-500">
+                        <h2 class="text-lg font-medium" :class="!policyNumberFound ? 'text-gray-300' : 'text-gray-700 '">Upload documents</h2>
+                        <p class="flex items-center gap-1" :class="!policyNumberFound ? 'text-blue-300' : 'text-blue-500'">
                             <svg class="w-[20px] h-[20px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 width="24" height="24" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                                     stroke-width="1.5"
                                     d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                             </svg>
-                            <span class="cursor-pointer hover:underline popup-open" data-popup=".checklist-popup">View
+                            <span class="cursor-pointer hover:underline popup-open" :class="!policyNumberFound ? 'text-gray-300' : 'text-gray-600'" data-popup=".checklist-popup">View
                                 document checklist</span>
                         </p>
                     </div>
@@ -411,12 +411,12 @@ onMounted(() => {
 
                     <!-- Click to Upload Action -->
                     <div class="space-y-2">
-                        <InputFile v-model="selectedFiles" multiple @fetchDocument="documentFetch" />
+                        <InputFile v-model="selectedFiles" multiple @fetchDocument="documentFetch" :canUpload="!policyNumberFound"/>
 
                         <!-- <p class="font-bold text-gray-600">Testing Upload File</p>
                     <InputFile2 v-model="selectedFiles" multiple /> -->
 
-                        <span class="text-gray-500">Supported files: doc, docx, pdf, jpg (max. 5MB)</span>
+                        <span :class="!policyNumberFound ? 'text-gray-300' : 'text-gray-600'">Supported files: doc, docx, pdf, jpg (max. 5MB)</span>
                     </div>
 
                     <div v-if="requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length > 0">
@@ -514,9 +514,9 @@ onMounted(() => {
 
                         <f7-button preloader :loading="isPreload"
                             v-else-if="selectedFiles.claim_type === '' && !selectedFiles.classified" fill large
-                            @click="getDocuments()" :disabled="isPreload">Submit</f7-button>
+                            @click="getDocuments()" :disabled="isPreload || !policyNumberFound">Submit</f7-button>
 
-                        <f7-button preloader :loading="isPreload" v-else :disabled="!classified || isPreload" fill large
+                        <f7-button preloader :loading="isPreload" v-else :disabled="!classified || isPreload || !policyNumberFound" fill large
                             @click="getDocuments()">Submit</f7-button>
                     </div>
 
