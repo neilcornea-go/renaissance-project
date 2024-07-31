@@ -4,7 +4,8 @@ const checklistData = {
         {
             "id": 1,
             "title": "Accident claims",
-            "items": ["Government ID", "Police/narration report", "Official receipts", "Hospital statement of account", "Certificate of employment / medical certificate"]
+            "items": ["Government ID", "Police/narration report", "Hospital statement of account"]
+            // "items": ["Government ID", "Police/narration report", "Official receipts", "Hospital statement of account", "Certificate of employment / medical certificate"]
         },
         {
             "id": 2,
