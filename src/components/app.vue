@@ -25,8 +25,8 @@
           primary: '#d31145',
         },
         view: {
-          // browserHistory: true,
-          // browserHistorySeparator: '',          
+          browserHistory: true,
+          browserHistorySeparator: '',          
         },
 
         // App store

@@ -205,6 +205,31 @@ onMounted(() => {
 
 })
 
+//see more and see less
+
+const expanded = ref(false);
+
+// Compute whether the text needs truncation based on sentence count
+const needsTruncation = computed(() => {
+    const sentenceCount = pr_facts_of_case.value.match(/[\w|\)][.?!](\s|$)/g)?.length || 0;
+    return sentenceCount > 4;
+});
+
+// Compute the text to display based on the expanded state
+const displayedText = computed(() => {
+    if (expanded.value || !needsTruncation.value) {
+        return pr_facts_of_case.value;
+    }
+    const sentences = pr_facts_of_case.value.split(/(?<=[.!?])\s+/).slice(0, 4);
+    return sentences.join(' ') + '...';
+});
+
+    // Function to toggle the expanded state
+    const toggleReadMore = () => {
+      expanded.value = !expanded.value;
+    };
+
+
 </script>
 
 <template>
@@ -291,7 +316,19 @@ onMounted(() => {
 
                 <div class="py-2">
                     <p>Fact of Case</p>
-                    <h3 class="font-bold">{{ pr_facts_of_case }}</h3>
+                    <h3 class="font-bold ">
+
+                        <div class="overflow-hidden transition-all duration-300 ease-in-out" 
+                        :style="{ maxHeight: expanded ? '1000px' : '60px', opacity: expanded ? '1' : '0.8' }">
+                        {{ displayedText }}
+                    </div>
+                        <button 
+                          v-if="needsTruncation" 
+                          @click="toggleReadMore" 
+                          class="text-gray-900 hover:text-gray-800 pt-4"
+                        >
+                          {{ expanded ? 'Read Less' : 'Read More' }}
+                        </button></h3>
                 </div>
 
                 <Divider class="border-gray-400" />
