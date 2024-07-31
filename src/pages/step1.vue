@@ -61,7 +61,7 @@ const { bankDetails } = useStaticData();
 const validatePolicy = async () => {
     const found = bankDetails.value.find(test => test.policyNumber === policyNumber.value);
     if (!found) {
-        errorPolicyNumber.value = "The policy number does not exist in our database.";
+        errorPolicyNumber.value = "The policy number does not exist in our record.";
         policyNumberFound.value = false;
     } else {
         errorPolicyNumber.value = null;
@@ -506,7 +506,7 @@ onMounted(() => {
                         <f7-button preloader :loading="isPreload"
                             v-if="selectedFiles.claim_type !== '' && selectedFiles.classified && (requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length >= 1)"
                             fill large @click="getDocuments()"
-                            :disabled="selectedFiles.uploaded.length === 0 || (requiredDocs.govtIDList.length === 1 && requiredDocs.accident.length === 0) || isPreload">Classify</f7-button>
+                            :disabled="selectedFiles.uploaded.length === 0 || (requiredDocs.govtIDList.length === 1 && requiredDocs.accident.length === 0) || isPreload">Submit</f7-button>
 
                         <f7-button preloader :loading="isPreload"
                             v-else-if="selectedFiles.claim_type !== '' && selectedFiles.classified" fill large
@@ -514,10 +514,10 @@ onMounted(() => {
 
                         <f7-button preloader :loading="isPreload"
                             v-else-if="selectedFiles.claim_type === '' && !selectedFiles.classified" fill large
-                            @click="getDocuments()" :disabled="isPreload">Classify</f7-button>
+                            @click="getDocuments()" :disabled="isPreload">Submit</f7-button>
 
                         <f7-button preloader :loading="isPreload" v-else :disabled="!classified || isPreload" fill large
-                            @click="getDocuments()">Classify</f7-button>
+                            @click="getDocuments()">Submit</f7-button>
                     </div>
 
 

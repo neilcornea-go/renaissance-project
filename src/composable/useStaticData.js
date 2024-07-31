@@ -25,11 +25,9 @@ const bankNameOptions = ref([
 ]);
 
 const typeOfAccountOptions = ref([
-    { id: '1', option: 'Current Account1' },
-    { id: '2', option: 'Current Account2' },
-    { id: '3', option: 'Current Account3' },
-    { id: '4', option: 'Current Account4' },
-    { id: '5', option: 'Current Account5' },
+    { id: '1', option: 'Savings' },
+    { id: '2', option: 'Current' },
+    
 
 ]);
 
@@ -94,7 +92,7 @@ const claimsChecklist = ref([
             bank_name: 'BPI',
             account_name: 'Test 1',
             account_number: '1234567890',
-            type_of_account: 'Current Account1',
+            type_of_account: 'Savings',
         },
         {
             id: '2',
@@ -102,7 +100,7 @@ const claimsChecklist = ref([
             bank_name: 'BPI',
             account_name: 'Hector Neil Cornea',
             account_number: '2345678901',
-            type_of_account: 'Current Account2',
+            type_of_account: 'Savings',
         },
 
         {
@@ -111,7 +109,7 @@ const claimsChecklist = ref([
             bank_name: 'Public Bank',
             account_name: 'Lawrence Layola',
             account_number: '3456789012',
-            type_of_account: 'Current Account3',
+            type_of_account: 'Current',
         },
 
         {
@@ -120,7 +118,7 @@ const claimsChecklist = ref([
             bank_name: 'BPI',
             account_name: 'Test 4',
             account_number: '4567890123',
-            type_of_account: 'Current Account4',
+            type_of_account: 'Current',
         },
 
         {
@@ -129,7 +127,7 @@ const claimsChecklist = ref([
             bank_name: 'BPI',
             account_name: 'Test 5',
             account_number: '5678901234',
-            type_of_account: 'Current Account5',
+            type_of_account: 'Current',
         },
 ]);
 
