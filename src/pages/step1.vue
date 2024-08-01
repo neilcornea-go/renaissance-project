@@ -16,7 +16,7 @@ import InputFile2 from "../components/common/input-file-2.vue";
 import { f7 } from 'framework7-vue';
 
 //Helpers
-import { segregateDocs, scoreDocs, filterDocs, lackingDocs, checkDocs, contentCheckDocs, checkErrorDocs, removeDocuments } from "../../src/js/helpers/common.js";
+import { segregateDocs, scoreDocs, filterDocs, lackingDocs, checkDocs, contentCheckDocs, checkErrorDocs, removeDocuments, openPreloader } from "../../src/js/helpers/common.js";
 
 import {
     getDocumentAnalysis,
@@ -75,6 +75,9 @@ const validatePolicy = async () => {
 };
 
 const getDocuments = async () => {
+
+     openPreloader(true);
+
     // Validate policy number
     console.log(selectedFiles.value.documents);
     isPreload.value = true;
@@ -121,20 +124,20 @@ const getDocuments = async () => {
         else {
             classify_doc.push(x)
         }
-    }
+    }    
     console.log(classify_doc, 'documents should include previous and new upload')
     selectedFiles.value.uploaded = []
     var classifyDoc = await segregateDocs(classify_doc) //result {govt_id_doc, other_doc}
-
+    
     selectedFiles.value.govt_id = classifyDoc.govt_id_doc //assigned to govt id listing
     console.log(classifyDoc, 'segregated documents should have the old and new and in different object')
     if (classifyDoc) { //here if 2 govt ids, should not proceed
         var scoreDocsResult = await scoreDocs(classifyDoc) //result "claim" name
-
+        
         if (scoreDocsResult) {
             selectedFiles.value.claim_type = scoreDocsResult
             console.log(scoreDocsResult)
-
+            
             var filterDocsResult = await filterDocs(classifyDoc.other_doc, scoreDocsResult) //{final_other_docs, not_included}
             if (filterDocsResult) {
 
@@ -146,20 +149,25 @@ const getDocuments = async () => {
                 selectedFiles.value.classified = true;
                 classified.value = true;
                 console.log(selectedFiles.value)
-
+            
                 var lackingDocsResult = await lackingDocs(selectedFiles.value.govt_id, selectedFiles.value.filter_other_doc, scoreDocsResult) //{govtIDList, accident}
                 console.log(lackingDocsResult)
                 requiredDocs.value = lackingDocsResult
             }
         }
     }
-    isPreload.value = false;
+    isPreload.value = false; 
+    setTimeout(function() {
+        openPreloader(false)
+    }, 5000)
     return;
 
 };
 
 
 const proceedDocuments = async () => {
+
+    openPreloader(true);
 
     isPreload.value = true;
     var checkDocsGovtResult = await checkDocs(selectedFiles.value.govt_id)
@@ -172,16 +180,29 @@ const proceedDocuments = async () => {
         if (checkDocsOtherResult) {
             selectedFiles.value.filter_other_doc = checkDocsOtherResult
             console.log(selectedFiles.value.filter_other_doc)
+            
+            setTimeout(function() {
+                openExtractModal()
+            }, 5000)
+            
 
-            f7.dialog.confirm('Extract data now?', () => {
-                // f7.dialog.alert('Great!');
-                contentCheck();
-                isPreload.value = false;
-            });
         }
     }
 
 };
+
+const openExtractModal = () => {
+
+            openPreloader(false);
+            f7.dialog.confirm('Are you sure to extract your data?', () => {
+                // f7.dialog.alert('Great!');
+                contentCheck();
+                isPreload.value = false;
+                
+                openPreloader(true);
+            });
+
+}
 
 const contentCheck = async () => {
 
@@ -241,6 +262,9 @@ const filterErrorDocs = async () => {
         selectedFiles.value.final_documents = combine_final_docs
         moveDocuments(selectedFiles.value);
     }
+    else {
+        openPreloader(false);
+    }
 
 }
 
@@ -266,6 +290,8 @@ const goTo = (route) => {
     f7.views.main.router.navigate(route, {
         animate: false
     });
+    
+    openPreloader(false);
 
 }
 
@@ -377,159 +403,161 @@ onMounted(() => {
                 <Title title="Submit a Claim" />
                 <Subtitle
                     subtitle="Let us know about your claim by entering your policy number and uploading all the required documents." />
+
+
+                <p class="flex items-center gap-1 text-blue-500">
+                    <svg class="w-[20px] h-[20px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24"
+                        height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                    </svg>
+
+                    <span class="cursor-pointer hover:underline popup-open text-gray-500"
+                        data-popup=".checklist-popup">View
+                        document checklist</span>
+                </p>
             </div>
 
             <!-- Upload Documents -->
-            <div class="flex flex-col gap-4">
-                <!-- Policy Number Input -->
-                <InputText :error="errorPolicyNumber" @change="validatePolicy" v-model="policyNumber"
-                    label="Policy number" placeholder="e.g. 123456789B" />
+            <!-- <div class="flex flex-col gap-4"> -->
+            <!-- Policy Number Input -->
+            <InputText :error="errorPolicyNumber" @change="validatePolicy" v-model="policyNumber" label="Policy Number"
+                placeholder="e.g. 123456789B" />
 
-                <!-- Will show when policy number is found -->
-                <div class="flex flex-col gap-4" v-if="true">
+            <!-- Will show when policy number is found -->
+            <div class="flex flex-col gap-4" v-if="true">
 
-                    <Divider />
+                <Divider />
 
-                    <!-- Title Header -->
-                    <div class="space-y-2">
-                        <h2 class="text-lg font-medium" :class="!policyNumberFound ? 'text-gray-300' : 'text-gray-700 '">Upload documents</h2>
-                        <p class="flex items-center gap-1" :class="!policyNumberFound ? 'text-blue-300' : 'text-blue-500'">
-                            <svg class="w-[20px] h-[20px]" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                            </svg>
-                            
-                            <span v-if="policyNumberFound" class="cursor-pointer hover:underline popup-open text-gray-600" data-popup=".checklist-popup">View
-                                document checklist</span>
-                            <span v-else class="text-gray-300">View document checklist</span>
-                        </p>
-                    </div>
+                <!-- Title Header -->
+                <div class="space-y-2">
+                    <h2 class="text-lg font-medium" :class="!policyNumberFound ? 'text-gray-300' : 'text-gray-700 '">
+                        Upload documents</h2>
+                </div>
 
-                    <!-- Checklist Popup -->
-                    <ChecklistPopup />
+                <!-- Checklist Popup -->
+                <ChecklistPopup />
 
 
-                    <!-- Click to Upload Action -->
-                    <div class="space-y-2">
-                        <InputFile v-model="selectedFiles" multiple @fetchDocument="documentFetch" :canUpload="!policyNumberFound"/>
+                <!-- Click to Upload Action -->
+                <div class="space-y-2">
+                    <InputFile v-model="selectedFiles" multiple @fetchDocument="documentFetch"
+                        :canUpload="!policyNumberFound" />
 
-                        <!-- <p class="font-bold text-gray-600">Testing Upload File</p>
+                    <!-- <p class="font-bold text-gray-600">Testing Upload File</p>
                     <InputFile2 v-model="selectedFiles" multiple /> -->
 
-                        <span :class="!policyNumberFound ? 'text-gray-300' : 'text-gray-600'">Supported files: doc, docx, pdf, jpg (max. 5MB)</span>
-                    </div>
+                    <span :class="!policyNumberFound ? 'text-gray-300' : 'text-gray-600'">Supported files: doc, docx,
+                        pdf, jpg (max. 5MB)</span>
+                </div>
 
-                    <div v-if="requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length > 0">
-                        <!-- <div v-if="true"> -->
-                        <span class="text-gray-500 font-semibold text-xs uppercase">Required Documents</span>
-                        <div :class="'bg-red-100 hover:bg-gray-200'"
-                            class="flex justify-between flex-wrap items-center p-4 my-2 rounded transition ease-in">
-                            <div class="flex flex-row justify-center gap-2 align-items-center">
-                                <div class="flex flex-direction-column">
+                <div v-if="requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length > 0">
+                    <!-- <div v-if="true"> -->
+                    <span class="text-gray-500 font-semibold text-xs uppercase">Required Documents</span>
+                    <div :class="'bg-red-100 hover:bg-gray-200'"
+                        class="flex justify-between flex-wrap items-center p-4 my-2 rounded transition ease-in">
+                        <div class="flex flex-row justify-center gap-2 align-items-center">
+                            <div class="flex flex-direction-column">
 
-                                    <div v-if="requiredDocs.govtIDList.length === 2">
-                                        <span class="text-gray-400 font-semibold text-xs uppercase">Atleast 1 government
-                                            ID</span>
-                                        <span class="text-gray-400 text-xs uppercase"
-                                            v-for="gov in requiredDocs.govtIDList">- {{ gov.replace(/-/g, ' ') }}</span>
-                                    </div>
-
-                                    <span class="text-gray-400 font-semibold text-xs uppercase"
-                                        v-if="requiredDocs.accident.length !== 0">Additional</span>
+                                <div v-if="requiredDocs.govtIDList.length === 2">
+                                    <span class="text-gray-400 font-semibold text-xs uppercase">Atleast 1 government
+                                        ID</span>
                                     <span class="text-gray-400 text-xs uppercase"
-                                        v-for="other in requiredDocs.accident">-
-                                        {{ other.replace(/-/g, ' ') }}</span>
+                                        v-for="gov in requiredDocs.govtIDList">- {{ gov.replace(/-/g, ' ') }}</span>
                                 </div>
 
+                                <span class="text-gray-400 font-semibold text-xs uppercase"
+                                    v-if="requiredDocs.accident.length !== 0">Additional</span>
+                                <span class="text-gray-400 text-xs uppercase" v-for="other in requiredDocs.accident">-
+                                    {{ other.replace(/-/g, ' ') }}</span>
                             </div>
+
                         </div>
                     </div>
-                    <!-- Documents List -->
-                    <div v-if="selectedFiles.classified && selectedFiles.uploaded.length >= 1">
-                        <span class="text-gray-500 font-semibold text-xs uppercase">Unprocessed File</span>
-                        <DocumentInfo type="normal" :files="selectedFiles.uploaded" />
-                    </div>
-                    <!-- government id -->
-                    <div v-if="!selectedFiles.classified">
-                        <DocumentInfo type="normal" :files="selectedFiles.documents" />
-                    </div>
-                    <div v-else>
-                        <span class="text-gray-500 font-semibold text-xs uppercase"
-                            v-if="selectedFiles.govt_id.length != 0">Government ID</span>
+                </div>
+                <!-- Documents List -->
+                <div v-if="selectedFiles.classified && selectedFiles.uploaded.length >= 1">
+                    <span class="text-gray-500 font-semibold text-xs uppercase">Unprocessed File</span>
+                    <DocumentInfo type="normal" :files="selectedFiles.uploaded" />
+                </div>
+                <!-- government id -->
+                <div v-if="!selectedFiles.classified">
+                    <DocumentInfo type="normal" :files="selectedFiles.documents" />
+                </div>
+                <div v-else>
+                    <span class="text-gray-500 font-semibold text-xs uppercase"
+                        v-if="selectedFiles.govt_id.length != 0">Government ID</span>
 
-                        <DocumentInfo v-if="selectedFiles.govt_id.length <= 1" type="normal"
-                            :files="selectedFiles.govt_id" />
+                    <DocumentInfo v-if="selectedFiles.govt_id.length <= 1" type="normal"
+                        :files="selectedFiles.govt_id" />
 
-                        <div v-else class="bg-gray-100 px-4 py-8 rounded">
-                            <p class="text-red-500 text-base mb-4">
-                                You are uploading more than 1 government ID, please delete the
-                                other IDs.
-                            </p>
-
-                            <!-- Error Documents List -->
-                            <DocumentInfo type="error" :delete_icon="true" :files="selectedFiles.govt_id" />
-                        </div>
-
-                        <span class="text-gray-500 font-semibold text-xs uppercase">Other Files</span>
-                        <DocumentInfo type="normal" :files="selectedFiles.filter_other_doc" />
-
-                    </div>
-
-                    <!-- Error Prompt -->
-                    <div class="bg-gray-100 px-4 py-8 rounded"
-                        v-if="classified && selectedFiles.error_files.length !== 0">
+                    <div v-else class="bg-gray-100 px-4 py-8 rounded">
                         <p class="text-red-500 text-base mb-4">
-                            It appears that these documents contains information that is not related to the policy
-                            holder. The document(s) below will be
-                            removed as they are not required.
+                            You are uploading more than 1 government ID, please delete the
+                            other IDs.
                         </p>
 
                         <!-- Error Documents List -->
-                        <DocumentInfo type="error" :delete_icon="false" :files="selectedFiles.error_files" />
+                        <DocumentInfo type="error" :delete_icon="true" :files="selectedFiles.govt_id" />
                     </div>
 
-                    <!-- Error Prompt -->
-                    <div class="bg-gray-100 px-4 py-8 rounded"
-                        v-if="classified && selectedFiles.not_included.length !== 0">
-                        <p class="text-red-500 text-base mb-4">
-                            It appears that you are filing a claim for an
-                            {{ selectedFiles.claim_type }}. The document(s) below will be
-                            removed as they are not required.
-                        </p>
+                    <span class="text-gray-500 font-semibold text-xs uppercase">Other Files</span>
+                    <DocumentInfo type="normal" :files="selectedFiles.filter_other_doc" />
 
-                        <!-- Error Documents List -->
-                        <DocumentInfo type="error" :delete_icon="false" :files="selectedFiles.not_included" />
-                    </div>
-                    <!-- Action Button -->
-                    <div class="bg-white my-3">
+                </div>
 
-                        <f7-button preloader :loading="isPreload"
-                            v-if="selectedFiles.claim_type !== '' && selectedFiles.classified && (requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length >= 1)"
-                            fill large @click="getDocuments()"
-                            :disabled="selectedFiles.uploaded.length === 0 || (requiredDocs.govtIDList.length === 1 && requiredDocs.accident.length === 0) || isPreload">Submit</f7-button>
+                <!-- Error Prompt -->
+                <div class="bg-gray-100 px-4 py-8 rounded" v-if="classified && selectedFiles.error_files.length !== 0">
+                    <p class="text-red-500 text-base mb-4">
+                        It appears that these documents contains information that is not related to the policy
+                        holder. The document(s) below will be
+                        removed as they are not required.
+                    </p>
 
-                        <f7-button preloader :loading="isPreload"
-                            v-else-if="selectedFiles.claim_type !== '' && selectedFiles.classified" fill large
-                            @click="proceedDocuments()" :disabled="isPreload">Verify</f7-button>
+                    <!-- Error Documents List -->
+                    <DocumentInfo type="error" :delete_icon="false" :files="selectedFiles.error_files" />
+                </div>
 
-                        <f7-button preloader :loading="isPreload"
-                            v-else-if="selectedFiles.claim_type === '' && !selectedFiles.classified" fill large
-                            @click="getDocuments()" :disabled="isPreload || !policyNumberFound">Submit</f7-button>
+                <!-- Error Prompt -->
+                <div class="bg-gray-100 px-4 py-8 rounded" v-if="classified && selectedFiles.not_included.length !== 0">
+                    <p class="text-red-500 text-base mb-4">
+                        It appears that you are filing a claim for an
+                        {{ selectedFiles.claim_type }}. The document(s) below will be
+                        removed as they are not required.
+                    </p>
 
-                        <f7-button preloader :loading="isPreload" v-else :disabled="!classified || isPreload || !policyNumberFound" fill large
-                            @click="getDocuments()">Submit</f7-button>
-                    </div>
+                    <!-- Error Documents List -->
+                    <DocumentInfo type="error" :delete_icon="false" :files="selectedFiles.not_included" />
+                </div>
+                <!-- Action Button -->
+                <div class="bg-white my-3">
+
+                    <f7-button preloader :loading="isPreload"
+                        v-if="selectedFiles.claim_type !== '' && selectedFiles.classified && (requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length >= 1)"
+                        fill large @click="getDocuments()"
+                        :disabled="selectedFiles.uploaded.length === 0 || (requiredDocs.govtIDList.length === 1 && requiredDocs.accident.length === 0) || isPreload">Upload</f7-button>
+
+                    <f7-button preloader :loading="isPreload"
+                        v-else-if="selectedFiles.claim_type !== '' && selectedFiles.classified" fill large
+                        @click="proceedDocuments()" :disabled="isPreload">Verify</f7-button>
+
+                    <f7-button preloader :loading="isPreload"
+                        v-else-if="selectedFiles.claim_type === '' && !selectedFiles.classified" fill large
+                        @click="getDocuments()" :disabled="isPreload || !selectedFiles.documents.length >= 1">Upload</f7-button>
+
+                    <f7-button preloader :loading="isPreload" v-else
+                        :disabled="!classified || isPreload || !policyNumberFound" fill large
+                        @click="getDocuments()">Upload</f7-button>
+                </div>
 
 
-                    <!-- <div class="bg-white my-3" v-if="dataExtracted">
+                <!-- <div class="bg-white my-3" v-if="dataExtracted">
                     <f7-button fill large @click="goTo('/step-2')">Step 2</f7-button>
                 </div> -->
 
-                    <!-- <f7-button fill large @click="uploadStorage()">Upload Storage</f7-button> -->
+                <!-- <f7-button fill large @click="uploadStorage()">Upload Storage</f7-button> -->
 
-                </div>
+                <!-- </div> -->
             </div>
         </section>
     </GlobalLayout>

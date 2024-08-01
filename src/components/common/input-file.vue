@@ -1,5 +1,7 @@
 <script setup>
 import { analyzeDocument } from "../../../src/js/hooks/documentClassifierAnalysis.js"
+//Helpers
+import { openPreloader } from "../../../src/js/helpers/common.js";
 
 const props = defineProps({
     modelValue: {
@@ -19,7 +21,8 @@ const props = defineProps({
 const emits = defineEmits(['update:modelValue', 'fetchDocument']);
 
 
-const updateValue = async (event) => {
+const updateValue = async (event) => {    
+    openPreloader(true);
     const getClaimsID = localStorage.getItem('claims-reference');
     const file = event.target.files;
 
@@ -58,7 +61,14 @@ const updateValue = async (event) => {
             const val = await classifyDoc(x);
             console.log(val)
             // emits('update:modelValue', val);
-            emits('fetchDocument', val)
+                           
+
+            setTimeout(function() {
+                emits('fetchDocument', val) 
+                openPreloader(false)
+            }, 5000)
+            
+            
         }
 
     }
@@ -109,7 +119,7 @@ const getBase64 = (value) => {
 <template>
     <div
         class="relative w-full border border-gray-400 rounded p-8 text-center bg-gray-100 hover:bg-gray-200 transition ease-in delay-75 cursor-pointer">
-        <span class="text-base font-normal" :class="canUpload ? 'text-gray-300' : ' text-gray-700'">Click to upload</span>
+        <span class="text-base font-normal" :class="canUpload ? 'text-gray-300' : ' text-gray-700'">Choose documents</span>
         <input :disabled="canUpload" @change="updateValue" type="file" class="absolute inset-0 opacity-0 cursor-pointer" multiple />
     </div>
 </template>

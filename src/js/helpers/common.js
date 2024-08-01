@@ -1,8 +1,14 @@
+import { f7 } from 'framework7-vue';
 
 import {
     analyzeModelDocument,
     getExtractedDocument
 } from "../../js/hooks/documentClassifierAnalysis.js";
+
+
+// Composable
+import { useStaticData } from '../../composable/useStaticData';
+const { randomMsg } = useStaticData();
 
   export const segregateDocs = async (docs) => {   
         
@@ -222,9 +228,9 @@ import {
         console.log(res);
         if (res.ok) {
             var extracted = res.data.data.analyzeResult.documents[0].fields
-            if(x.document_type === 'ph-passport') var fullname = extracted.fname.content+' '+ extracted.lname.content
-            if(x.document_type === 'hospital-statement') var fullname = extracted.hs_fname.content+' '+ extracted.hs_lname.content
-            if(x.document_type === 'police-narration-report') var fullname = extracted.pr_fname.content+' '+ extracted.pr_lname.content
+            if(x.document_type === 'ph-passport') var fullname = cleanString(extracted.fname.content)+' '+ cleanString(extracted.lname.content)
+            if(x.document_type === 'hospital-statement') var fullname = cleanString(extracted.hs_fname.content)+' '+ cleanString(extracted.hs_lname.content)
+            if(x.document_type === 'police-narration-report') var fullname = cleanString(extracted.pr_fname.content)+' '+ cleanString(extracted.pr_lname.content)
 
             var claimant = JSON.parse(localStorage.getItem("claimant"));
             if(fullname.toLowerCase() !== claimant.account_name.toLowerCase()){ var error = true; var errorMsg = 'Document information is not for policy holder.'}
@@ -253,6 +259,31 @@ import {
         er = x
     }
     return er
+  }
+
+  export const openPreloader = (progress) => {
+
+        if(progress) {
+            var dialog = f7.dialog.progress();
+            dialog.setText(getRandomMsg(JSON.parse(JSON.stringify(randomMsg.value))))
+        }
+
+        else {
+            f7.dialog.close();
+        }
+
+  }
+
+  export const cleanString = (str) => {
+    str = str.trim()
+    str = str.replace(/[^a-zA-Z0-9\s-]/g, '');
+
+    return str
+  }
+
+  export const getRandomMsg = (arr) => {
+    const randomIndex = Math.floor(Math.random() * arr.length);
+    return arr[randomIndex]
   }
   
   
