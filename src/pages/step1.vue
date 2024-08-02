@@ -451,16 +451,16 @@ onMounted(() => {
                         pdf, jpg (max. 5MB)</span>
                 </div>
 
-                <div v-if="requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length > 0">
+                    <div v-if="requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length > 0">
                     <!-- <div v-if="true"> -->
-                    <span class="text-gray-500 font-semibold text-xs uppercase">Required Documents</span>
-                    <div :class="'bg-red-100 hover:bg-gray-200'"
+                    <span class="text-gray-700 font-semibold text-xs uppercase">Required Documents</span>
+                    <div :class="'bg-red-100'"
                         class="flex justify-between flex-wrap items-center p-4 my-2 rounded transition ease-in">
                         <div class="flex flex-row justify-center gap-2 align-items-center">
                             <div class="flex flex-direction-column">
 
                                 <div v-if="requiredDocs.govtIDList.length === 2">
-                                    <span class="text-gray-400 font-semibold text-xs uppercase">Atleast 1 government
+                                    <span class="text-gray-400 font-semibold text-xs uppercase">Atleast 1 Government
                                         ID</span>
                                     <span class="text-gray-400 text-xs uppercase"
                                         v-for="gov in requiredDocs.govtIDList">- {{ gov.replace(/-/g, ' ') }}</span>

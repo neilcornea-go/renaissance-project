@@ -45,7 +45,7 @@ const removeDocument = (i) =>{
                     <div class="flex flex-direction-column">
                         <span class="text-gray-500 font-bold">{{file.file.name.length >= 15 ? file.file.name.slice(0, 15)+`...`+file.file.name.slice(file.file.name.length - 5, file.file.name.length) : file.file.name}}</span>
                         <span class="text-gray-400 font-semibold text-xs uppercase">{{file.document_type}}</span>
-                        <span class="text-gray-400 font-semibold text-xs uppercase"> {{file.confidence_rate ? 'Confidence: '+ file.confidence_rate : ''}}</span>
+                        <!-- <span class="text-gray-400 font-semibold text-xs uppercase"> {{file.confidence_rate ? 'Confidence: '+ file.confidence_rate : ''}}</span> -->
                     </div>
                     
                 </div>

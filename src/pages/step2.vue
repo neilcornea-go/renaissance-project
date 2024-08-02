@@ -115,26 +115,6 @@ const doneOTP = (x) => {
             lead_disablement: selectedAccidentDisablement.value
         }
 
-        // console.log(claimsData)
-
-        // console.log(JSON.parse(localStorage.getItem('form')))
-        // // get the form
-        // var getForm = JSON.parse(localStorage.getItem('form'))
-
-        // //get document shortlist
-        // var getDocumentShortlist = JSON.parse(localStorage.getItem('documents_shortlist'))
-
-        // //get the documents in document shortlist
-        // getForm.documents = getDocumentShortlist.documents
-
-        // // add a content in the claim details in form
-        // getForm.claim_details = { ...claimsData }
-        // // remove first what is in localstorage
-        // localStorage.removeItem('form');
-        // //then set again the new form
-        // localStorage.setItem('form', JSON.stringify(getForm))
-        // console.log('ls', getForm)
-
         const getDocumentShortlist = JSON.parse(localStorage.getItem('documents_shortlist'));
         const getForm = JSON.parse(localStorage.getItem('form'));
         if (!getForm.documents.length) {
@@ -172,6 +152,8 @@ const nextForm = () => {
         confined_accident: selectedAccidentInvolve.value,
         lead_disablement: selectedAccidentDisablement.value
     }
+
+
 
     // Update the Form
     const getForm = JSON.parse(localStorage.getItem('form'));
@@ -257,7 +239,7 @@ const nextForm = () => {
             <!-- Action Button -->
             <div class="bg-white my-3 space-y-4">
                 <f7-button fill large @click="nextForm()">Next</f7-button>
-                <f7-button class="border-red-600" outline large @click="handleBack()">Back</f7-button>
+                <!-- <f7-button class="border-red-600" outline large @click="handleBack()">Back</f7-button> -->
             </div>
         </section>
     </GlobalLayout>
