@@ -61,7 +61,7 @@ const { bankDetails } = useStaticData();
 const validatePolicy = async () => {
     const found = bankDetails.value.find(test => test.policyNumber === policyNumber.value);
     if (!found) {
-        errorPolicyNumber.value = "The policy number does not exist in our record.";
+        errorPolicyNumber.value = "The Policy Number does not exist in our record.";
         policyNumberFound.value = false;
     } else {
         errorPolicyNumber.value = null;

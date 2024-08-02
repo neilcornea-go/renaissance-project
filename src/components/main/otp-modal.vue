@@ -119,7 +119,7 @@ const goTo = (route) => {
                 <!-- Resend Code Prompt -->
                 <div>
                     <p class="text-gray-600 text-base">You can request a new code after <span class="font-bold text-gray-700">{{ formattedTime }}</span></p>
-                    <p @click="resendCode" class="text-blue-600 uppercase text-base font-medium underline hover:text-blue-700 cursor-pointer">Resend code</p>
+                    <p @click="resendCode" class="text-blue-600 text-base font-medium underline hover:text-blue-700 cursor-pointer flex justify-center">Resend OTP</p>
                 </div>
             </div>
         </f7-block>

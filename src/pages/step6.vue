@@ -81,19 +81,13 @@ const getCookieValue = (cookieName) => {
 
                 <f7-card class="bg-[#f1f1f1] py-4 md:w-9/12 mx-auto group">
                     <f7-card-content>
-                        <a href="#" class="flex justify-between">
-                            <p>Claim reference number(s)</p>
-                            <svg class="w-6 h-6 text-gray-800 dark:text-white opacity-0 absolute right-5 transition-opacity duration-300 group-hover:opacity-100"
-                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
-                                viewBox="0 0 24 24">
-                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
-                                    stroke-width="2" d="m9 5 7 7-7 7" />
-                            </svg>
+                        <a href="#" class="flex justify-center">
+                            <p>Claim reference number(s)</p>  
                         </a>
-                        <h3 class="text-xl font-medium">{{ claimsNumber ? claimsNumber : 'Loading...' }}</h3>
+                        <h3 class="flex justify-center text-xl font-medium">{{ claimsNumber ? claimsNumber : 'Loading...' }}</h3>
                         <Divider />
 
-                        <p class="flex mx-auto">
+                        <p class="flex justify-center mx-auto">
                             <svg class="w-6 h-6 text-gray-800 dark:text-white pr-1" aria-hidden="true"
                                 xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"
                                 viewBox="0 0 24 24">
@@ -111,7 +105,7 @@ const getCookieValue = (cookieName) => {
 
                 <div class="text-center pb-4">
                     <f7-link class="" href="/" external @click="newClaim()">
-                        <h2 class="uppercase text-base underline text-blue-700 font-light">
+                        <h2 class="text-base underline text-blue-700 font-light">
                             Submit a new claim
                         </h2>
                     </f7-link>
