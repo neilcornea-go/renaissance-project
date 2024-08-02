@@ -13,6 +13,9 @@ import { f7 } from 'framework7-vue';
 import { database } from '../js/firebase';
 import { collection, where, getDocs, addDoc, query, serverTimestamp } from "firebase/firestore";
 
+import {  openPreloader } from "../../src/js/helpers/common.js";
+
+
 // Data Hook for Accident Section
 //step1
 const policy_number = ref('');
@@ -71,9 +74,12 @@ const goTo = (route) => {
 }
 
 const NextPage = () => {
+
+    openPreloader(true);
     isPreload.value = true;
     setTimeout(() => {
         isPreload.value = false;
+        openPreloader(false)
         if (!isPreload.value) {
             const toast = f7.toast.create({
                 text: `Successfully submitted claims`,
@@ -251,7 +257,7 @@ const displayedText = computed(() => {
                     <Title title="Claims Details" class="!text-xl" />
 
                     <a @click="goTo('/step-2')">
-                        <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true"
+                        <svg class="w-6 h-6 text-[#b91c1c]" aria-hidden="true"
                             xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M10.779 17.779 4.36 19.918 6.5 13.5m4.279 4.279 8.364-8.643a3.027 3.027 0 0 0-2.14-5.165 3.03 3.03 0 0 0-2.14.886L6.5 13.5m4.279 4.279L6.499 13.5m2.14 2.14 6.213-6.504M12.75 7.04 17 11.28" />
@@ -325,7 +331,7 @@ const displayedText = computed(() => {
                         <button 
                           v-if="needsTruncation" 
                           @click="toggleReadMore" 
-                          class="text-gray-900 hover:text-gray-800 pt-4"
+                          class="text-[#b91c1c] hover:text-[#f87171] pt-4"
                         >
                           {{ expanded ? 'Read Less' : 'Read More' }}
                         </button></h3>
