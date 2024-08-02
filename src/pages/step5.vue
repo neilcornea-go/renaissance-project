@@ -77,9 +77,8 @@ const NextPage = () => {
 
     openPreloader(true);
     isPreload.value = true;
-    setTimeout(() => {
+    setTimeout( async () => {
         isPreload.value = false;
-        openPreloader(false)
         if (!isPreload.value) {
             const toast = f7.toast.create({
                 text: `Successfully submitted claims`,
@@ -88,15 +87,17 @@ const NextPage = () => {
                 closeButtonColor: 'green',
                 closeTimeout: 3000,
             });
-            submitClaims();
 
-            toast.open();
+            await submitClaims();
+
+            // toast.open();
 
             localStorage.removeItem('claimant');
             localStorage.removeItem('claims-reference');
             localStorage.removeItem('documents_shortlist');
             localStorage.removeItem('form');
 
+            openPreloader(false)
             goTo('/step-6');
         }
     }, 2000);

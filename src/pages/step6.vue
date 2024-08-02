@@ -9,11 +9,12 @@ import Divider from "../components/common/divider.vue";
 
 const claimsNumber = ref('')
 const isPreload = ref(false);
+// const claimsReference = ref(getCookieValue('claims_no'));
 
-const claimsGenerated = () => {
-    const claimsReference = getCookieValue('claims_no');
-    claimsNumber.value = claimsReference;
-}
+// const claimsGenerated = () => {
+//     const claimsReference = getCookieValue('claims_no');
+//     claimsNumber.value = claimsReference;
+// }
 
 const goTo = (route) => {
     f7.views.main.router.navigate(route, {
@@ -38,9 +39,9 @@ const newClaim = () => {
 }
 
 onMounted(() => {
-    setTimeout(() => {
-        claimsGenerated();
-    }, 1000);
+    // setTimeout(() => {
+    //     claimsGenerated();
+    // }, 1000);
 
 });
 
@@ -84,7 +85,7 @@ const getCookieValue = (cookieName) => {
                         <a href="#" class="flex justify-center">
                             <p>Claim reference number(s)</p>  
                         </a>
-                        <h3 class="flex justify-center text-xl font-medium">{{ claimsNumber ? claimsNumber : 'Loading...' }}</h3>
+                        <h3 class="flex justify-center text-xl font-medium">{{ getCookieValue('claims_no') }}</h3>
                         <Divider />
 
                         <p class="flex justify-center mx-auto">
