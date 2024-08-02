@@ -133,9 +133,9 @@ const backForm = () => {
     <div>
         <InputText disabled v-model="FormData.docName" label="Type of Government ID" placeholder="e.g. Passport" />
         <InputText v-model="FormData.govt_id" label="ID No." placeholder="ID No." />
-        <InputText v-model="FormData.fname" label="First Name" placeholder="First Name" />
-        <InputText v-model="FormData.mname" label="Middle Name" placeholder="Middle Name" />
-        <InputText v-model="FormData.lname" label="Last Name" placeholder="Last Name" />
+        <InputText disabled v-model="FormData.fname" label="First Name" placeholder="First Name" />
+        <InputText disabled v-model="FormData.mname" label="Middle Name" placeholder="Middle Name" />
+        <InputText disabled v-model="FormData.lname" label="Last Name" placeholder="Last Name" />
         <InputDate type="date" v-model="FormData.dob" label="Date of birth" />
         <Dropdown v-model="FormData.sex" label="Sex" :data="genderOptions" />
         <Dropdown v-model="FormData.nationality" label="Nationality" :data="nationalityOptions" />
