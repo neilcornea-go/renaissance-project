@@ -117,15 +117,26 @@ const doneOTP = (x) => {
 
         const getDocumentShortlist = JSON.parse(localStorage.getItem('documents_shortlist'));
         const getForm = JSON.parse(localStorage.getItem('form'));
+        let totalConfidence = 0;
+        let confidenceCount = 0;
+
         if (!getForm.documents.length) {
             getForm.documents = transformDocumentsObject(getDocumentShortlist.documents);
             getForm.claim_details = { ...claimsData };
+            getForm.confidence = {};
+            getDocumentShortlist.documents.forEach(document => {
+                if (document.docType && document.confidence) {
+                    const confidencePercentage = (Number(document.confidence) * 100).toFixed(2) + "%";
+                    getForm.confidence[`${document.docType}-confidence`] = confidencePercentage;
+                    totalConfidence += parseFloat(confidencePercentage);
+                    confidenceCount++;
+                }
+            });
+            getForm.confidence.overall_confidence = confidenceCount ? (totalConfidence / confidenceCount).toFixed(2) + "%" : 0;
             localStorage.removeItem('form');
             localStorage.setItem('form', JSON.stringify(getForm));
             console.log('ls', getForm);
         }
-
-        console.log('test', getForm.documents);
     }
 }
 
