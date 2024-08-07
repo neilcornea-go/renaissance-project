@@ -559,3 +559,10 @@ onMounted(() => {
         </section>
     </GlobalLayout>
 </template>
+
+<style scoped>
+
+
+
+
+</style>
