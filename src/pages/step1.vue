@@ -16,11 +16,7 @@ import InputFile2 from "../components/common/input-file-2.vue";
 import { f7 } from 'framework7-vue';
 
 //Helpers
-import { segregateDocs, scoreDocs, filterDocs, lackingDocs, checkDocs, contentCheckDocs, checkErrorDocs, removeDocuments, openPreloader } from "../../src/js/helpers/common.js";
-
-import {
-    getDocumentAnalysis,
-} from "../../src/js/hooks/documentClassifierAnalysis.js";
+import { analyzeDocument, segregateDocs, scoreDocs, filterDocs, lackingDocs, checkDocs, contentCheckDocs, checkErrorDocs, removeDocuments, openPreloader, threeErrorTried } from "../../src/js/helpers/common.js";
 
 import { storage, database } from '../js/firebase';
 import { ref as fileRef, uploadString } from "firebase/storage";
@@ -51,6 +47,7 @@ const requiredDocs = ref({
     govtIDList: [],
     accident: []
 })
+const errorCounter = ref(0);
 const errorPolicyNumber = ref("");
 const classified = ref(false);
 const dataExtracted = ref(false);
@@ -76,7 +73,7 @@ const validatePolicy = async () => {
 
 const getDocuments = async () => {
 
-     openPreloader(true);
+    openPreloader(true);
 
     // Validate policy number
     console.log(selectedFiles.value.documents);
@@ -84,90 +81,85 @@ const getDocuments = async () => {
     const docs = selectedFiles.value.uploaded.length >= 1 ? selectedFiles.value.documents.concat(selectedFiles.value.uploaded) : selectedFiles.value.documents;
 
     console.log('combined', docs);
-    //govt list of IDs
-    const govtID = ["ph-passport", "drivers-license"];
-    const accident = [
-        "ph-passport",
-        "drivers-license",
-        "police-narration-report",
-        "hospital-statement",
-    ];
-    const illness = [
-        "ph-passport",
-        "drivers-license",
-        "medical-certificate",
-        "hospital-statement",
-    ];
-    const death = [
-        "ph-passport",
-        "drivers-license",
-        "death-certificate",
-        "marriage-certificate",
-    ];
 
-    var classify_doc = [];
-    for (let i = 0; i < docs.length; i++) {
+    /*************************************************/
+    /*                   #1                          */
+    /*************************************************/
 
-        var x = docs[i];
-        if (x.document_type === '') {
-            const res = await getDocumentAnalysis(x.operation_location);
-            console.log(res);
-            console.log("confidence rate: " + Number(res.data.data.analyzeResult.documents[0].confidence) * 100 + "%", res.data.data.analyzeResult.documents[0].docType);
+    var classify_doc = await analyzeDocument(docs)
 
-            x.document_type = res.data.data.analyzeResult.documents[0].docType;
-            x.confidence_rate = (Number(res.data.data.analyzeResult.documents[0].confidence) * 100).toFixed(2) + "%";
-            x.govtid = govtID.includes(res.data.data.analyzeResult.documents[0].docType);
-            x.notIncluded = accident.includes(res.data.data.analyzeResult.documents[0].docType);
-            x.extracted_data = res.data.data.analyzeResult.documents[0]
-            classify_doc.push(x)
-        }
-        else {
-            classify_doc.push(x)
-        }
-    }    
-    console.log(classify_doc, 'documents should include previous and new upload')
-    selectedFiles.value.uploaded = []
-    var classifyDoc = await segregateDocs(classify_doc) //result {govt_id_doc, other_doc}
+    var seg_confidence_rate = await checkErrorDocs(classify_doc)
+
+    selectedFiles.value.error_files = seg_confidence_rate.error_docs
+
+    var err_count = seg_confidence_rate.error_docs.length > 0 ? errorCounter.value + 1 : errorCounter.value
     
-    selectedFiles.value.govt_id = classifyDoc.govt_id_doc //assigned to govt id listing
-    console.log(classifyDoc, 'segregated documents should have the old and new and in different object')
-    if (classifyDoc) { //here if 2 govt ids, should not proceed
-        var scoreDocsResult = await scoreDocs(classifyDoc) //result "claim" name
-        
-        if (scoreDocsResult) {
-            selectedFiles.value.claim_type = scoreDocsResult
-            console.log(scoreDocsResult)
-            
-            var filterDocsResult = await filterDocs(classifyDoc.other_doc, scoreDocsResult) //{final_other_docs, not_included}
-            if (filterDocsResult) {
+    var triedThreeErrors = await threeErrorTried(err_count, seg_confidence_rate)
 
-                selectedFiles.value.filter_other_doc = filterDocsResult.final_other_docs //assigned to final docs listing
+    if(triedThreeErrors.terminate_process){
 
-                selectedFiles.value.not_included = filterDocsResult.not_included //assigned to final docs listing
+        console.log('terminated')
+        return;
 
-                console.log(filterDocsResult)
-                selectedFiles.value.classified = true;
-                classified.value = true;
-                console.log(selectedFiles.value)
-            
-                var lackingDocsResult = await lackingDocs(selectedFiles.value.govt_id, selectedFiles.value.filter_other_doc, scoreDocsResult) //{govtIDList, accident}
-                console.log(lackingDocsResult)
-                requiredDocs.value = lackingDocsResult
+    }
+
+    else {
+    errorCounter.value = triedThreeErrors.error_count
+    console.log(seg_confidence_rate.safe_docs, seg_confidence_rate.error_docs)
+    // return;
+
+    if (seg_confidence_rate.safe_docs !== 0) { // put else with the pop-up to email the documents
+        selectedFiles.value.uploaded = []
+
+        var classifyDoc = await segregateDocs(seg_confidence_rate.safe_docs) //result {govt_id_doc, other_doc}
+
+
+        selectedFiles.value.govt_id = classifyDoc.govt_id_doc //assigned to govt id listing
+        console.log(classifyDoc, 'segregated documents should have the old and new and in different object')
+        if (classifyDoc) { //here if 2 govt ids, should not proceed
+            var scoreDocsResult = await scoreDocs(classifyDoc) //result "claim" name
+
+            if (scoreDocsResult) {
+                selectedFiles.value.claim_type = scoreDocsResult
+                console.log(scoreDocsResult)
+
+                var filterDocsResult = await filterDocs(classifyDoc.other_doc, scoreDocsResult) //{final_other_docs, not_included}
+                if (filterDocsResult) {
+
+                    selectedFiles.value.filter_other_doc = filterDocsResult.final_other_docs //assigned to final docs listing
+
+                    selectedFiles.value.not_included = filterDocsResult.not_included //assigned to final docs listing
+
+                    console.log(filterDocsResult)
+                    selectedFiles.value.classified = true;
+                    classified.value = true;
+                    console.log(selectedFiles.value)
+
+                    var lackingDocsResult = await lackingDocs(selectedFiles.value.govt_id, selectedFiles.value.filter_other_doc, scoreDocsResult) //{govtIDList, accident}
+                    console.log(lackingDocsResult)
+                    requiredDocs.value = lackingDocsResult
+                }
             }
         }
+
     }
-    isPreload.value = false; 
-    setTimeout(function() {
-        openPreloader(false)
-    }, 5000)
+
+    isPreload.value = false;
+    setTimeout(function () {
+        // openPreloader(false)
+        proceedDocuments()
+    }, 10000)
     return;
+
+    }
+
 
 };
 
 
 const proceedDocuments = async () => {
 
-    openPreloader(true);
+    // openPreloader(true);
 
     isPreload.value = true;
     var checkDocsGovtResult = await checkDocs(selectedFiles.value.govt_id)
@@ -180,11 +172,12 @@ const proceedDocuments = async () => {
         if (checkDocsOtherResult) {
             selectedFiles.value.filter_other_doc = checkDocsOtherResult
             console.log(selectedFiles.value.filter_other_doc)
-            
-            setTimeout(function() {
-                openExtractModal()
-            }, 5000)
-            
+
+            setTimeout(function () {
+                // openExtractModal()
+                contentCheck()
+            }, 10000)
+
 
         }
     }
@@ -193,14 +186,14 @@ const proceedDocuments = async () => {
 
 const openExtractModal = () => {
 
-            openPreloader(false);
-            f7.dialog.confirm('Are you sure to extract your data?', () => {
-                // f7.dialog.alert('Great!');
-                contentCheck();
-                isPreload.value = false;
-                
-                openPreloader(true);
-            });
+    openPreloader(false);
+    f7.dialog.confirm('Are you sure to extract your data?', () => {
+        // f7.dialog.alert('Great!');
+        contentCheck();
+        isPreload.value = false;
+
+        openPreloader(true);
+    });
 
 }
 
@@ -264,6 +257,7 @@ const filterErrorDocs = async () => {
     }
     else {
         openPreloader(false);
+        isPreload.value = false;
     }
 
 }
@@ -290,7 +284,7 @@ const goTo = (route) => {
     f7.views.main.router.navigate(route, {
         animate: false
     });
-    
+
     openPreloader(false);
 
 }
@@ -451,7 +445,7 @@ onMounted(() => {
                         pdf, jpg (max. 5MB)</span>
                 </div>
 
-                    <div v-if="requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length > 0">
+                <div v-if="requiredDocs.govtIDList.length === 2 || requiredDocs.accident.length > 0">
                     <!-- <div v-if="true"> -->
                     <span class="text-gray-700 font-semibold text-xs uppercase">Required Documents</span>
                     <div :class="'bg-red-100'"
@@ -461,9 +455,12 @@ onMounted(() => {
 
                                 <div v-if="requiredDocs.govtIDList.length === 2">
                                     <span class="text-gray-400 font-semibold text-xs uppercase">Atleast 1 Government
-                                        ID</span>
-                                    <span class="text-gray-400 text-xs uppercase"
-                                        v-for="gov in requiredDocs.govtIDList">- {{ gov.replace(/-/g, ' ') }}</span>
+                                        ID</span> <br />
+                                    <span class="text-gray-400 text-xs uppercase" v-for="gov in requiredDocs.govtIDList">
+                                        
+                                            - {{ gov.replace(/-/g, ' ') }} <br />
+                                        
+                                    </span>
                                 </div>
 
                                 <span class="text-gray-400 font-semibold text-xs uppercase"
@@ -509,9 +506,8 @@ onMounted(() => {
                 <!-- Error Prompt -->
                 <div class="bg-gray-100 px-4 py-8 rounded" v-if="classified && selectedFiles.error_files.length !== 0">
                     <p class="text-red-500 text-base mb-4">
-                        It appears that these documents contains information that is not related to the policy
-                        holder. The document(s) below will be
-                        removed as they are not required.
+                        It appears that these documents contains some errors. The document(s) below will be
+                        removed as they are not needed.
                     </p>
 
                     <!-- Error Documents List -->
@@ -543,7 +539,8 @@ onMounted(() => {
 
                     <f7-button preloader :loading="isPreload"
                         v-else-if="selectedFiles.claim_type === '' && !selectedFiles.classified" fill large
-                        @click="getDocuments()" :disabled="isPreload || !selectedFiles.documents.length >= 1">Upload</f7-button>
+                        @click="getDocuments()"
+                        :disabled="isPreload || !selectedFiles.documents.length >= 1">Upload</f7-button>
 
                     <f7-button preloader :loading="isPreload" v-else
                         :disabled="!classified || isPreload || !policyNumberFound" fill large

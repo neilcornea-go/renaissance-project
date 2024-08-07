@@ -1,6 +1,7 @@
 import { f7 } from 'framework7-vue';
 
 import {
+    getDocumentAnalysis,
     analyzeModelDocument,
     getExtractedDocument
 } from "../../js/hooks/documentClassifierAnalysis.js";
@@ -8,7 +9,58 @@ import {
 
 // Composable
 import { useStaticData } from '../../composable/useStaticData';
-const { randomMsg } = useStaticData();
+const { randomMsg, govtID, accident, illness, death } = useStaticData();
+
+
+export const analyzeDocument = async (docs) => {
+    
+   
+    var classify_doc = [];
+    for (let i = 0; i < docs.length; i++) {
+
+        var x = docs[i];
+        if (x.document_type === '') {
+            const res = await getDocumentAnalysis(x.operation_location);
+            console.log(res);
+            console.log("confidence rate: " + Number(res.data.data.analyzeResult.documents[0].confidence) * 100 + "%", res.data.data.analyzeResult.documents[0].docType);
+
+            x.document_type = res.data.data.analyzeResult.documents[0].docType;
+            x.confidence_rate = (Number(res.data.data.analyzeResult.documents[0].confidence) * 100).toFixed(2) + "%";
+            x.govtid = govtID.value.includes(res.data.data.analyzeResult.documents[0].docType);
+            x.notIncluded = accident.value.includes(res.data.data.analyzeResult.documents[0].docType);
+            x.extracted_data = res.data.data.analyzeResult.documents[0]
+            x.error = await lowConfidenceRate(Number(res.data.data.analyzeResult.documents[0].confidence))
+            x.errorMsg = await lowConfidenceRate(Number(res.data.data.analyzeResult.documents[0].confidence)) ? 'This document has less than 50% confidence rate.' : ''
+            classify_doc.push(x)
+        }
+        else {
+            classify_doc.push(x)
+        }
+    }  
+
+    console.log(classify_doc, 'documents should include previous and new upload')
+
+    return classify_doc
+}
+
+export const lowConfidenceRate = async (rate) => {
+    return (rate * 100) < 50 ? true : false
+}
+
+export const threeErrorTried = async (errCount, docs) => {
+    if(docs.safe_docs.length === 0){
+        return {terminate_process: true, error_count: errCount}
+    }
+    else {
+        if(errCount === 3){
+            return {terminate_process: true, error_count: errCount}
+        }
+        else {
+            return {terminate_process: false, error_count: errCount}
+        }
+    }
+}
+
 
   export const segregateDocs = async (docs) => {   
         

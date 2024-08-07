@@ -44,13 +44,14 @@ const removeDocument = (i) =>{
                     </span>
                     <div class="flex flex-direction-column">
                         <span class="text-gray-500 font-bold">{{file.file.name.length >= 15 ? file.file.name.slice(0, 15)+`...`+file.file.name.slice(file.file.name.length - 5, file.file.name.length) : file.file.name}}</span>
-                        <span class="text-gray-400 font-semibold text-xs uppercase">{{file.document_type}}</span>
-                        <!-- <span class="text-gray-400 font-semibold text-xs uppercase"> {{file.confidence_rate ? 'Confidence: '+ file.confidence_rate : ''}}</span> -->
+                        <span v-if="type !== 'error'"  class="text-gray-400 font-semibold text-xs uppercase">{{file.document_type}}</span>
+                        <span v-if="type === 'error'"class="text-gray-400 font-semibold text-xs uppercase"> {{file.confidence_rate ? 'Confidence: '+ file.confidence_rate : ''}}</span>
+                        <span v-if="type === 'error'" class="text-red-400 text-xs"> {{file.errorMsg}}</span>
                     </div>
                     
                 </div>
 
-                <div class="flex flex-row gap-2 md:gap-8">
+                <div v-if="type !== 'error'" class="flex flex-row gap-2 md:gap-8">
                     <span class="text-gray-500">{{((file.file.size/1024)/1024).toFixed(2)}}MB</span>
                     <!-- View Action -->
                     <span

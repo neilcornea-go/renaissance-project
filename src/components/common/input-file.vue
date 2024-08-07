@@ -21,7 +21,8 @@ const props = defineProps({
 const emits = defineEmits(['update:modelValue', 'fetchDocument']);
 
 
-const updateValue = async (event) => {    
+const updateValue = async (event) => {   
+    console.log('here') 
     openPreloader(true);
     const getClaimsID = localStorage.getItem('claims-reference');
     const file = event.target.files;
@@ -35,7 +36,10 @@ const updateValue = async (event) => {
     }
 
     // Check if a file is selected
-    if (!file) return;
+    if (!file){
+        console.log('file is selected')
+        return;
+    } 
 
     for (let files = 0; files < file.length; files++) {
 
@@ -66,7 +70,7 @@ const updateValue = async (event) => {
             setTimeout(function() {
                 emits('fetchDocument', val) 
                 openPreloader(false)
-            }, 5000)
+            }, 8000)
             
             
         }
@@ -92,7 +96,7 @@ const classifyDoc = async (value) => {
             documents.push(newFile)
             console.log(newFile)
 
-        } catch (error) { }
+        } catch (error) { console.log(error)}
 
         if(i === (value.length - 1)){
             // const container = {claim_type: '', documents, classified: false, govt_id:[], filter_other_doc:[], other_doc:[], not_included:[], final_documents:[]}

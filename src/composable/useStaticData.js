@@ -131,6 +131,27 @@ const bankDetails = ref([
     },
 ]);
 
+    //govt list of IDs
+    const govtID = ref(["ph-passport", "drivers-license"]);
+    const accident = ref([
+        "ph-passport",
+        "drivers-license",
+        "police-narration-report",
+        "hospital-statement",
+    ])
+    const illness = ref([
+        "ph-passport",
+        "drivers-license",
+        "medical-certificate",
+        "hospital-statement",
+    ]);
+    const death = ref([
+        "ph-passport",
+        "drivers-license",
+        "death-certificate",
+        "marriage-certificate",
+    ]);
+
 const randomMsg = ref([
     "We understand this process can be challenging.",
     "We are here to support you every step of the way.",
@@ -196,7 +217,10 @@ export function useStaticData() {
         relationshipOptions,
         genderOptions,
         claimsChecklist,
-        randomMsg
-
+        randomMsg,
+        govtID,
+        accident,
+        illness,
+        death
     };
 }
