@@ -205,6 +205,15 @@ const randomMsg = ref([
     "Our dedication to you is unwavering.",
 ])
 
+const notificationBody = (body) => {
+    switch (body) {
+        case 'three':
+            return "You submitted error documents in three consecutive uploads."
+        case 'all':
+            return "The documents you submitted are not readable, which has resulted in a low confidence rate."
+    }
+  }
+
 export function useStaticData() {
     return {
         bankDetails,
@@ -221,6 +230,7 @@ export function useStaticData() {
         govtID,
         accident,
         illness,
-        death
+        death,
+        notificationBody
     };
 }

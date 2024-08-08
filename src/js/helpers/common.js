@@ -49,14 +49,14 @@ export const lowConfidenceRate = async (rate) => {
 
 export const threeErrorTried = async (errCount, docs) => {
     if(docs.safe_docs.length === 0){
-        return {terminate_process: true, error_count: errCount}
+        return {terminate_process: true, error_count: errCount, error_type: 'all'}
     }
     else {
         if(errCount === 3){
-            return {terminate_process: true, error_count: errCount}
+            return {terminate_process: true, error_count: errCount, error_type: 'three'}
         }
         else {
-            return {terminate_process: false, error_count: errCount}
+            return {terminate_process: false, error_count: errCount, error_type: 'three'}
         }
     }
 }

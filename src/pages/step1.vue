@@ -7,6 +7,7 @@ import Subtitle from "../components/common/subtitle.vue";
 import Divider from "../components/common/divider.vue";
 import DocumentInfo from "../components/main/document-info.vue";
 import ChecklistPopup from "../components/main/checklist-popup.vue";
+import NotifactionModal from "../components/common/pop-up-notification.vue";
 
 // Form Input Components
 import InputText from "../components/common/input-text.vue";
@@ -48,6 +49,8 @@ const requiredDocs = ref({
     accident: []
 })
 const errorCounter = ref(0);
+const notificationModalOpen = ref(false);
+const errorType = ref('');
 const errorPolicyNumber = ref("");
 const classified = ref(false);
 const dataExtracted = ref(false);
@@ -99,7 +102,10 @@ const getDocuments = async () => {
     if(triedThreeErrors.terminate_process){
 
         console.log('terminated')
-        return;
+        notificationModalOpen.value = true
+        isPreload.value = false
+        errorType.value = triedThreeErrors.error_type
+        openPreloader(false);
 
     }
 
@@ -381,6 +387,11 @@ const generateClaimsID = computed(() => {
     return `${prefix}${randomNumber}`;
 });
 
+const closeNotif = () => {
+    notificationModalOpen.value = false
+    location.reload()
+}
+
 onMounted(() => {
     jumpNext();
 });
@@ -555,6 +566,8 @@ onMounted(() => {
                 <!-- <f7-button fill large @click="uploadStorage()">Upload Storage</f7-button> -->
 
                 <!-- </div> -->
+
+                <NotifactionModal type="error" @btnClose="closeNotif()" :isOpen="notificationModalOpen" notifTitle="Document Submission Required" :notifBody="errorType" />
             </div>
         </section>
     </GlobalLayout>
