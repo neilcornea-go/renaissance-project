@@ -575,7 +575,25 @@ onMounted(() => {
 
 <style scoped>
 
+.claims-popup {
+    height: 100%;
+    width: 100%;
+    left: 55%;
+    top: 60%;
+    max-width: 500px;
+    max-height: 360px;
+    border-radius: 12px;
+}
 
-
+@media (max-width: 630px) {
+    .claims-popup {
+        height: 100%;
+        width: 90%;
+        left: 5%;
+        top: 15%;
+        border-radius: 12px;
+        max-height: 420px;
+    }
+}   
 
 </style>
