@@ -6,12 +6,12 @@ import ArticleCard from "../components/common/articleCard.vue";
 import Title from "../components/common/title.vue";
 import Divider from "../components/common/divider.vue";
 
-import OTPModal from '../components/common/pop-up-notification.vue';
+// import OTPModal from '../components/common/pop-up-notification.vue';
 
 
 const claimsNumber = ref('')
 const isPreload = ref(false);
-const isOpenOTP = ref(false);
+// const isOpenOTP = ref(false);
 // const claimsReference = ref(getCookieValue('claims_no'));
 
 // const claimsGenerated = () => {
@@ -26,7 +26,7 @@ const goTo = (route) => {
 };
 
 const NextPage = () => {
-    isOpenOTP.value = true;
+    // isOpenOTP.value = true;
     isPreload.value = true;
     setTimeout(() => {
         isPreload.value = false;
@@ -121,7 +121,7 @@ const getCookieValue = (cookieName) => {
                 </f7-card>
 
                 <!-- OTP Popup -->
-                <OTPModal :isOpen="isOpenOTP" @otpDone="doneOTP" @update:isOpen="isOpenOTP = $event" />
+                <!-- <OTPModal :isOpen="isOpenOTP" @otpDone="doneOTP" @update:isOpen="isOpenOTP = $event" /> -->
 
                 <div class="py-4">
                     <f7-button @click="NextPage()" preloader :loading="isPreload" :disabled="isPreload" fill large
@@ -161,7 +161,7 @@ const getCookieValue = (cookieName) => {
 </template>
 
 
-<style scoped>
+<!-- <style scoped>
 
 .claims-popup {
     height: 100%;
@@ -184,4 +184,4 @@ const getCookieValue = (cookieName) => {
     }
 }   
 
-</style>
+</style> -->
