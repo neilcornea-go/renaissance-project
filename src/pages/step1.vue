@@ -592,7 +592,7 @@ onMounted(() => {
         left: 5%;
         top: 15%;
         border-radius: 12px;
-        max-height: 420px;
+        max-height: 500px;
     }
 }   
 

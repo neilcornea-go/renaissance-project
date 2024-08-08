@@ -49,7 +49,7 @@ const closeBtn = () => {
 </script>
 
 <template>
-    <f7-popup v-model:opened="notifOpen" class="claims-popup">
+    <f7-popup v-model:opened="notifOpen" :close-by-backdrop-click="false" :close-on-escape="false" class="claims-popup">
 
             <img class="mx-auto pt-4" src="https://img.icons8.com/?size=100&id=fYgQxDaH069W&format=png&color=000000" alt="cancel">
 
