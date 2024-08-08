@@ -22,16 +22,24 @@ export const analyzeDocument = async (docs) => {
         if (x.document_type === '') {
             const res = await getDocumentAnalysis(x.operation_location);
             console.log(res);
-            console.log("confidence rate: " + Number(res.data.data.analyzeResult.documents[0].confidence) * 100 + "%", res.data.data.analyzeResult.documents[0].docType);
+            if(res.data.data.status === 'succeeded'){
+                console.log("confidence rate: " + Number(res.data.data.analyzeResult.documents[0].confidence) * 100 + "%", res.data.data.analyzeResult.documents[0].docType);
+    
+                x.document_type = res.data.data.analyzeResult.documents[0].docType;
+                x.confidence_rate = (Number(res.data.data.analyzeResult.documents[0].confidence) * 100).toFixed(2) + "%";
+                x.govtid = govtID.value.includes(res.data.data.analyzeResult.documents[0].docType);
+                x.notIncluded = accident.value.includes(res.data.data.analyzeResult.documents[0].docType);
+                x.extracted_data = res.data.data.analyzeResult.documents[0]
+                x.error = await lowConfidenceRate(Number(res.data.data.analyzeResult.documents[0].confidence))
+                x.errorMsg = await lowConfidenceRate(Number(res.data.data.analyzeResult.documents[0].confidence)) ? 'This document has less than 50% confidence rate.' : ''
+                classify_doc.push(x)
+            }
+            else {
+                x.error = true
+                x.errorMsg = 'This document is '+res.data.data.status+'.'
+                classify_doc.push(x)
 
-            x.document_type = res.data.data.analyzeResult.documents[0].docType;
-            x.confidence_rate = (Number(res.data.data.analyzeResult.documents[0].confidence) * 100).toFixed(2) + "%";
-            x.govtid = govtID.value.includes(res.data.data.analyzeResult.documents[0].docType);
-            x.notIncluded = accident.value.includes(res.data.data.analyzeResult.documents[0].docType);
-            x.extracted_data = res.data.data.analyzeResult.documents[0]
-            x.error = await lowConfidenceRate(Number(res.data.data.analyzeResult.documents[0].confidence))
-            x.errorMsg = await lowConfidenceRate(Number(res.data.data.analyzeResult.documents[0].confidence)) ? 'This document has less than 50% confidence rate.' : ''
-            classify_doc.push(x)
+            }
         }
         else {
             classify_doc.push(x)
