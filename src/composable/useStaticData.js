@@ -208,9 +208,9 @@ const randomMsg = ref([
 const notificationBody = (body) => {
     switch (body) {
         case 'three':
-            return "You submitted error documents in three consecutive uploads."
+            return "The submission has failed after several consecutive attempts."
         case 'all':
-            return "The documents you submitted are not readable, which has resulted in a low confidence rate."
+            return "Thank you for providing the documents. Unfortunately, they are not readable due to poor image quality."
     }
   }
 

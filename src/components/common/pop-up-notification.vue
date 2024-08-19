@@ -61,12 +61,10 @@ const closeBtn = () => {
         </f7-block>
 
         <f7-block class="mt-1">
-            <p>{{bodyNotif}} Please send the correct documents to our
-                email to ensure your claim is handled promptly, please send the necessary documents to our email
-                address:</p>
+            <p>{{bodyNotif}} Kindly send clear and updated documents via email to ensure your claim is handled promptly; include your Policy Number in the subject line for quicker processing.</p>
             <p class="py-4"><strong>Email:</strong> claims@yourcompany.com</p>
-            <p>Include your policy number in the subject line for quicker processing.</p>
-            <p class="pt-4">Thank you for your cooperation!</p>
+            <p>Please know we are committed to ensuring that it is carefully reviewed and processed in a timely manner.</p>
+            <p class="pt-4">Thank you.</p>
         </f7-block>
 
         <f7-block>

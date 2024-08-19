@@ -31,7 +31,7 @@ export const analyzeDocument = async (docs) => {
                 x.notIncluded = accident.value.includes(res.data.data.analyzeResult.documents[0].docType);
                 x.extracted_data = res.data.data.analyzeResult.documents[0]
                 x.error = await lowConfidenceRate(Number(res.data.data.analyzeResult.documents[0].confidence))
-                x.errorMsg = await lowConfidenceRate(Number(res.data.data.analyzeResult.documents[0].confidence)) ? 'This document has less than 50% confidence rate.' : ''
+                x.errorMsg = await lowConfidenceRate(Number(res.data.data.analyzeResult.documents[0].confidence)) ? "The document cannot be verified and may contain unreliable information." : ''
                 classify_doc.push(x)
             }
             else {
@@ -293,7 +293,7 @@ export const threeErrorTried = async (errCount, docs) => {
             if(x.document_type === 'police-narration-report') var fullname = cleanString(extracted.pr_fname.content)+' '+ cleanString(extracted.pr_lname.content)
 
             var claimant = JSON.parse(localStorage.getItem("claimant"));
-            if(fullname.toLowerCase() !== claimant.account_name.toLowerCase()){ var error = true; var errorMsg = 'Document information is not for policy holder.'}
+            if(fullname.toLowerCase() !== claimant.account_name.toLowerCase()){ var error = true; var errorMsg = 'Document information is not of the policy holder.'}
             else{ var error = false; var errorMsg = ''}
             x.extracted_data = res.data
             docs_extracted.push({...docs[i], extracted_data: res.data, error, errorMsg})

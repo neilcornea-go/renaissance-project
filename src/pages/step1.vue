@@ -517,8 +517,7 @@ onMounted(() => {
                 <!-- Error Prompt -->
                 <div class="bg-gray-100 px-4 py-8 rounded" v-if="classified && selectedFiles.error_files.length !== 0">
                     <p class="text-red-500 text-base mb-4">
-                        It appears that these documents contains some errors. The document(s) below will be
-                        removed as they are not needed.
+                        It appears that incorrect documents have been submitted. Please check the requirements to ensure the correct required documents are provided.
                     </p>
 
                     <!-- Error Documents List -->
